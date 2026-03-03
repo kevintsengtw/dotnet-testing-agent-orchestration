@@ -14,13 +14,17 @@ public class BookCatalog
     public bool IsValidIsbn13(string isbn)
     {
         if (string.IsNullOrWhiteSpace(isbn))
+        {
             return false;
+        }
 
         // 移除連字號
         var digits = isbn.Replace("-", "");
 
         if (digits.Length != 13 || !digits.All(char.IsDigit))
+        {
             return false;
+        }
 
         // ISBN-13 校驗碼驗證
         var sum = 0;
@@ -44,10 +48,14 @@ public class BookCatalog
     public decimal CalculateDiscountPrice(decimal originalPrice, int membershipYears)
     {
         if (originalPrice < 0)
+        {
             throw new ArgumentException("Price cannot be negative", nameof(originalPrice));
+        }
 
         if (membershipYears < 0)
+        {
             throw new ArgumentException("Membership years cannot be negative", nameof(membershipYears));
+        }
 
         // 折扣率：0-1 年 0%、2-4 年 5%、5-9 年 10%、10+ 年 15%
         var discountRate = membershipYears switch
@@ -70,10 +78,14 @@ public class BookCatalog
     public decimal CalculateOverdueFine(int overdueDays, decimal bookPrice)
     {
         if (overdueDays <= 0)
+        {
             return 0m;
+        }
 
         if (bookPrice < 0)
+        {
             throw new ArgumentException("Book price cannot be negative", nameof(bookPrice));
+        }
 
         // 每日罰款：$1，最高不超過書籍定價的 50%
         var dailyFine = 1m;
@@ -91,7 +103,9 @@ public class BookCatalog
     public string ClassifyByPageCount(int pageCount)
     {
         if (pageCount <= 0)
+        {
             throw new ArgumentException("Page count must be positive", nameof(pageCount));
+        }
 
         return pageCount switch
         {
@@ -113,13 +127,19 @@ public class BookCatalog
     public string GenerateIndexCode(string genre, string author, int publishYear)
     {
         if (string.IsNullOrWhiteSpace(genre))
+        {
             throw new ArgumentException("Genre is required", nameof(genre));
+        }
 
         if (string.IsNullOrWhiteSpace(author))
+        {
             throw new ArgumentException("Author is required", nameof(author));
+        }
 
         if (publishYear < 1450 || publishYear > 2100)
+        {
             throw new ArgumentOutOfRangeException(nameof(publishYear), "Publish year must be between 1450 and 2100");
+        }
 
         var genreCode = genre.Length >= 3 ? genre[..3].ToUpperInvariant() : genre.ToUpperInvariant();
         var authorInitial = author.Trim()[0].ToString().ToUpperInvariant();
@@ -136,7 +156,9 @@ public class BookCatalog
     {
         var yearsOld = DateTime.Today.Year - publishedDate.Year;
         if (publishedDate.Date > DateTime.Today.AddYears(-yearsOld))
+        {
             yearsOld--;
+        }
 
         return yearsOld >= 50;
     }

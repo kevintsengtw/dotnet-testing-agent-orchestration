@@ -23,10 +23,14 @@ public class ConfigurationLoader
     public Dictionary<string, string> LoadConfig(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
+        {
             throw new ArgumentException("Path cannot be null or empty", nameof(path));
+        }
 
         if (!_fileSystem.File.Exists(path))
+        {
             throw new FileNotFoundException($"Config file not found: {path}", path);
+        }
 
         var content = _fileSystem.File.ReadAllText(path);
         return ParseConfig(content);
@@ -40,14 +44,20 @@ public class ConfigurationLoader
     public string LoadJsonConfig(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
+        {
             throw new ArgumentException("Path cannot be null or empty", nameof(path));
+        }
 
         if (!_fileSystem.File.Exists(path))
+        {
             throw new FileNotFoundException($"Config file not found: {path}", path);
+        }
 
         var extension = _fileSystem.Path.GetExtension(path);
         if (!extension.Equals(".json", StringComparison.OrdinalIgnoreCase))
+        {
             throw new InvalidOperationException($"Expected JSON file but got: {extension}");
+        }
 
         return _fileSystem.File.ReadAllText(path);
     }
@@ -60,10 +70,14 @@ public class ConfigurationLoader
     public void SaveConfig(string path, Dictionary<string, string> config)
     {
         if (string.IsNullOrWhiteSpace(path))
+        {
             throw new ArgumentException("Path cannot be null or empty", nameof(path));
+        }
 
         if (config == null)
+        {
             throw new ArgumentNullException(nameof(config));
+        }
 
         var directory = _fileSystem.Path.GetDirectoryName(path);
         if (!string.IsNullOrEmpty(directory) && !_fileSystem.Directory.Exists(directory))
@@ -85,7 +99,9 @@ public class ConfigurationLoader
     public bool ConfigExists(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
+        {
             return false;
+        }
 
         return _fileSystem.File.Exists(path);
     }
@@ -98,10 +114,14 @@ public class ConfigurationLoader
     public DateTime GetLastModifiedTime(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
+        {
             throw new ArgumentException("Path cannot be null or empty", nameof(path));
+        }
 
         if (!_fileSystem.File.Exists(path))
+        {
             throw new FileNotFoundException($"Config file not found: {path}", path);
+        }
 
         return _fileSystem.File.GetLastWriteTimeUtc(path);
     }
@@ -115,10 +135,14 @@ public class ConfigurationLoader
     public IEnumerable<string> ListConfigFiles(string directory, string pattern = "*.config")
     {
         if (string.IsNullOrWhiteSpace(directory))
+        {
             throw new ArgumentException("Directory cannot be null or empty", nameof(directory));
+        }
 
         if (!_fileSystem.Directory.Exists(directory))
+        {
             throw new DirectoryNotFoundException($"Directory not found: {directory}");
+        }
 
         return _fileSystem.Directory.GetFiles(directory, pattern);
     }
@@ -131,10 +155,14 @@ public class ConfigurationLoader
     public bool DeleteConfig(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
+        {
             return false;
+        }
 
         if (!_fileSystem.File.Exists(path))
+        {
             return false;
+        }
 
         _fileSystem.File.Delete(path);
         return true;
@@ -149,13 +177,19 @@ public class ConfigurationLoader
     public string BackupConfig(string sourcePath, string backupDirectory)
     {
         if (string.IsNullOrWhiteSpace(sourcePath))
+        {
             throw new ArgumentException("Source path cannot be null or empty", nameof(sourcePath));
+        }
 
         if (string.IsNullOrWhiteSpace(backupDirectory))
+        {
             throw new ArgumentException("Backup directory cannot be null or empty", nameof(backupDirectory));
+        }
 
         if (!_fileSystem.File.Exists(sourcePath))
+        {
             throw new FileNotFoundException($"Source file not found: {sourcePath}", sourcePath);
+        }
 
         if (!_fileSystem.Directory.Exists(backupDirectory))
         {
@@ -176,7 +210,9 @@ public class ConfigurationLoader
     private static Dictionary<string, string> ParseConfig(string content)
     {
         if (string.IsNullOrWhiteSpace(content))
+        {
             return new Dictionary<string, string>();
+        }
 
         return content
             .Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)

@@ -35,7 +35,10 @@ public static class Database
     public static UserRecord GetUser(int userId)
     {
         if (!_users.TryGetValue(userId, out var user))
+        {
             throw new InvalidOperationException($"User {userId} not found");
+        }
+
         return user;
     }
 
@@ -45,23 +48,10 @@ public static class Database
     public static List<TransactionRecord> GetTransactions(int userId)
     {
         if (!_transactions.TryGetValue(userId, out var transactions))
+        {
             return new List<TransactionRecord>();
+        }
+
         return transactions;
     }
-}
-
-public class UserRecord
-{
-    public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
-}
-
-public class TransactionRecord
-{
-    public int Id { get; set; }
-    public int UserId { get; set; }
-    public decimal Amount { get; set; }
-    public DateTime Date { get; set; }
-    public string Description { get; set; } = string.Empty;
 }

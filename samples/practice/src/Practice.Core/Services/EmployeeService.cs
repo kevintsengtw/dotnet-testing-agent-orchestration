@@ -15,26 +15,40 @@ public class EmployeeService
     public ValidationResult ValidateEmployee(Employee employee)
     {
         if (employee == null)
+        {
             throw new ArgumentNullException(nameof(employee));
+        }
 
         var errors = new List<string>();
 
         if (string.IsNullOrWhiteSpace(employee.FirstName))
+        {
             errors.Add("FirstName is required");
+        }
 
         if (string.IsNullOrWhiteSpace(employee.LastName))
+        {
             errors.Add("LastName is required");
+        }
 
         if (string.IsNullOrWhiteSpace(employee.Email))
+        {
             errors.Add("Email is required");
+        }
         else if (!IsValidEmail(employee.Email))
+        {
             errors.Add("Email format is invalid");
+        }
 
         if (employee.Salary < 0)
+        {
             errors.Add("Salary cannot be negative");
+        }
 
         if (employee.HireDate > DateTime.Today)
+        {
             errors.Add("HireDate cannot be in the future");
+        }
 
         return new ValidationResult
         {
@@ -52,10 +66,14 @@ public class EmployeeService
     public decimal CalculateAnnualBonus(Employee employee, int performanceRating)
     {
         if (employee == null)
+        {
             throw new ArgumentNullException(nameof(employee));
+        }
 
         if (performanceRating < 1 || performanceRating > 5)
+        {
             throw new ArgumentOutOfRangeException(nameof(performanceRating), "Performance rating must be between 1 and 5");
+        }
 
         // 基本獎金比例：績效 1=0%, 2=5%, 3=10%, 4=15%, 5=20%
         var bonusPercentage = (performanceRating - 1) * 0.05m;
@@ -80,7 +98,9 @@ public class EmployeeService
     public string GetEmployeeSummary(Employee employee)
     {
         if (employee == null)
+        {
             throw new ArgumentNullException(nameof(employee));
+        }
 
         var departmentInfo = employee.Department != null
             ? $", Department: {employee.Department.Name}"
@@ -101,7 +121,9 @@ public class EmployeeService
     public SalaryAnalysis AnalyzeDepartmentSalary(Department department)
     {
         if (department == null)
+        {
             throw new ArgumentNullException(nameof(department));
+        }
 
         if (department.Employees.Count == 0)
         {
@@ -137,7 +159,9 @@ public class EmployeeService
     public EmployeeReport GenerateEmployeeReport(IEnumerable<Employee> employees)
     {
         if (employees == null)
+        {
             throw new ArgumentNullException(nameof(employees));
+        }
 
         var employeeList = employees.ToList();
 
@@ -169,38 +193,4 @@ public class EmployeeService
             return false;
         }
     }
-}
-
-/// <summary>
-/// 驗證結果
-/// </summary>
-public class ValidationResult
-{
-    public bool IsValid { get; set; }
-    public List<string> Errors { get; set; } = new();
-}
-
-/// <summary>
-/// 薪資分析結果
-/// </summary>
-public class SalaryAnalysis
-{
-    public string DepartmentName { get; set; } = string.Empty;
-    public int EmployeeCount { get; set; }
-    public decimal TotalSalary { get; set; }
-    public decimal AverageSalary { get; set; }
-    public decimal MinSalary { get; set; }
-    public decimal MaxSalary { get; set; }
-}
-
-/// <summary>
-/// 員工報告
-/// </summary>
-public class EmployeeReport
-{
-    public DateTime GeneratedAt { get; set; }
-    public int TotalEmployees { get; set; }
-    public decimal TotalSalary { get; set; }
-    public Dictionary<string, int> DepartmentBreakdown { get; set; } = new();
-    public Dictionary<string, int> SkillsDistribution { get; set; } = new();
 }

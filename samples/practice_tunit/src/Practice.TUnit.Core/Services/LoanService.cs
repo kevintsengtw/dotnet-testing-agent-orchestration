@@ -41,18 +41,24 @@ public class LoanService
                    ?? throw new KeyNotFoundException($"Book '{bookId}' not found");
 
         if (book.Status != BookStatus.Available)
+        {
             throw new InvalidOperationException($"Book is not available (current status: {book.Status})");
+        }
 
         var member = await _memberRepository.GetByIdAsync(memberId)
                      ?? throw new KeyNotFoundException($"Member '{memberId}' not found");
 
         if (!member.IsActive)
+        {
             throw new InvalidOperationException("Member account is inactive");
+        }
 
         var activeLoans = await _loanRepository.GetActiveLoansByMemberAsync(memberId);
         if (activeLoans.Count >= member.MaxBooksAllowed)
+        {
             throw new InvalidOperationException(
                 $"Member has reached maximum loan limit ({member.MaxBooksAllowed})");
+        }
 
         var now = _timeProvider.GetUtcNow();
         var loan = new Loan
@@ -84,7 +90,9 @@ public class LoanService
                    ?? throw new KeyNotFoundException($"Loan '{loanId}' not found");
 
         if (loan.Status == LoanStatus.Returned)
+        {
             throw new InvalidOperationException("Book has already been returned");
+        }
 
         var book = await _bookRepository.GetByIdAsync(loan.BookId)
                    ?? throw new KeyNotFoundException($"Book '{loan.BookId}' not found");
@@ -125,14 +133,20 @@ public class LoanService
                    ?? throw new KeyNotFoundException($"Loan '{loanId}' not found");
 
         if (loan.Status == LoanStatus.Returned)
+        {
             throw new InvalidOperationException("Cannot renew a returned loan");
+        }
 
         if (loan.Status == LoanStatus.Overdue)
+        {
             throw new InvalidOperationException("Cannot renew an overdue loan");
+        }
 
         if (loan.RenewalCount >= loan.MaxRenewals)
+        {
             throw new InvalidOperationException(
                 $"Maximum renewal limit reached ({loan.MaxRenewals})");
+        }
 
         var member = await _memberRepository.GetByIdAsync(loan.MemberId)
                      ?? throw new KeyNotFoundException($"Member '{loan.MemberId}' not found");
@@ -211,29 +225,4 @@ public class LoanService
                 (l.DueDate - now).TotalDays <= 3 && l.DueDate >= now)
         };
     }
-}
-
-/// <summary>
-/// 歸還結果
-/// </summary>
-public class ReturnResult
-{
-    public Guid LoanId { get; set; }
-    public bool IsOverdue { get; set; }
-    public int OverdueDays { get; set; }
-    public decimal Fine { get; set; }
-}
-
-/// <summary>
-/// 借閱摘要
-/// </summary>
-public class LoanSummary
-{
-    public Guid MemberId { get; set; }
-    public string MemberName { get; set; } = string.Empty;
-    public int ActiveLoanCount { get; set; }
-    public int MaxAllowed { get; set; }
-    public int RemainingSlots { get; set; }
-    public int OverdueCount { get; set; }
-    public int DueSoonCount { get; set; }
 }

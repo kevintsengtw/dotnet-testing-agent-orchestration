@@ -42,17 +42,25 @@ public class OrderProcessingService
     public async Task<OrderResult> ProcessOrderAsync(Order order)
     {
         if (order == null)
+        {
             throw new ArgumentNullException(nameof(order));
+        }
 
         // 驗證訂單
         if (order.Items.Count == 0)
+        {
             return OrderResult.Failed("Order has no items");
+        }
 
         if (string.IsNullOrWhiteSpace(order.CustomerId))
+        {
             return OrderResult.Failed("Customer ID is required");
+        }
 
         if (string.IsNullOrWhiteSpace(order.CustomerEmail))
+        {
             return OrderResult.Failed("Customer email is required");
+        }
 
         // 檢查是否在營業時間
         var now = _timeProvider.GetLocalNow();
@@ -95,17 +103,23 @@ public class OrderProcessingService
     {
         var order = await _orderRepository.GetByIdAsync(orderId);
         if (order == null)
+        {
             return false;
+        }
 
         if (order.Status != OrderStatus.Completed && order.Status != OrderStatus.Pending)
+        {
             return false;
+        }
 
         // 如果有交易識別碼，進行退款
         if (!string.IsNullOrEmpty(transactionId))
         {
             var refundResult = await _paymentGateway.RefundAsync(transactionId, order.TotalAmount);
             if (!refundResult.Success)
+            {
                 return false;
+            }
         }
 
         order.Status = OrderStatus.Cancelled;
@@ -159,10 +173,14 @@ public class OrderProcessingService
     public decimal CalculateTotalWithTax(Order order, decimal taxRate)
     {
         if (order == null)
+        {
             throw new ArgumentNullException(nameof(order));
+        }
 
         if (taxRate < 0)
+        {
             throw new ArgumentException("Tax rate cannot be negative", nameof(taxRate));
+        }
 
         return order.TotalAmount * (1 + taxRate);
     }

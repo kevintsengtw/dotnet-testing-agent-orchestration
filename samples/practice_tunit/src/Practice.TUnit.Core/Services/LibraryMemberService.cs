@@ -33,17 +33,25 @@ public class LibraryMemberService
     public async Task<LibraryMember> RegisterMemberAsync(string name, string email, MembershipType membershipType)
     {
         if (string.IsNullOrWhiteSpace(name))
+        {
             throw new ArgumentException("Name is required", nameof(name));
+        }
 
         if (string.IsNullOrWhiteSpace(email))
+        {
             throw new ArgumentException("Email is required", nameof(email));
+        }
 
         if (!IsValidEmail(email))
+        {
             throw new ArgumentException("Invalid email format", nameof(email));
+        }
 
         var existingMember = await _memberRepository.GetByEmailAsync(email);
         if (existingMember != null)
+        {
             throw new InvalidOperationException($"Member with email '{email}' already exists");
+        }
 
         var member = new LibraryMember
         {
@@ -67,27 +75,43 @@ public class LibraryMemberService
     public MemberValidationResult ValidateMember(LibraryMember member)
     {
         if (member == null)
+        {
             throw new ArgumentNullException(nameof(member));
+        }
 
         var errors = new List<string>();
 
         if (string.IsNullOrWhiteSpace(member.Name))
+        {
             errors.Add("Name is required");
+        }
         else if (member.Name.Length < 2)
+        {
             errors.Add("Name must be at least 2 characters");
+        }
         else if (member.Name.Length > 100)
+        {
             errors.Add("Name must not exceed 100 characters");
+        }
 
         if (string.IsNullOrWhiteSpace(member.Email))
+        {
             errors.Add("Email is required");
+        }
         else if (!IsValidEmail(member.Email))
+        {
             errors.Add("Email format is invalid");
+        }
 
         if (member.JoinDate > DateTime.UtcNow)
+        {
             errors.Add("Join date cannot be in the future");
+        }
 
         if (member.PhoneNumber != null && member.PhoneNumber.Length < 8)
+        {
             errors.Add("Phone number must be at least 8 digits");
+        }
 
         return new MemberValidationResult
         {
@@ -108,11 +132,15 @@ public class LibraryMemberService
                      ?? throw new KeyNotFoundException($"Member '{memberId}' not found");
 
         if (!member.IsActive)
+        {
             throw new InvalidOperationException("Cannot upgrade inactive member");
+        }
 
         if (newType <= member.MembershipType)
+        {
             throw new InvalidOperationException(
                 $"New type '{newType}' must be higher than current type '{member.MembershipType}'");
+        }
 
         member.MembershipType = newType;
         await _memberRepository.UpdateAsync(member);
@@ -129,18 +157,26 @@ public class LibraryMemberService
     {
         var member = await _memberRepository.GetByIdAsync(memberId);
         if (member == null)
+        {
             return (false, "Member not found");
+        }
 
         if (!member.IsActive)
+        {
             return (false, "Member account is inactive");
+        }
 
         var activeLoans = await _loanRepository.GetActiveLoansByMemberAsync(memberId);
         if (activeLoans.Count >= member.MaxBooksAllowed)
+        {
             return (false, $"Maximum loan limit reached ({member.MaxBooksAllowed} books)");
+        }
 
         var hasOverdue = activeLoans.Any(l => l.Status == LoanStatus.Overdue);
         if (hasOverdue)
+        {
             return (false, "Member has overdue books");
+        }
 
         return (true, null);
     }
@@ -177,13 +213,4 @@ public class LibraryMemberService
             return false;
         }
     }
-}
-
-/// <summary>
-/// 會員驗證結果
-/// </summary>
-public class MemberValidationResult
-{
-    public bool IsValid { get; set; }
-    public List<string> Errors { get; set; } = new();
 }

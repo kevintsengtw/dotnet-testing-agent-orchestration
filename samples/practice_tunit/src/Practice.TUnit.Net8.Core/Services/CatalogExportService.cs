@@ -1,6 +1,4 @@
 using System.IO.Abstractions;
-using System.Text;
-using System.Text.Json;
 using Practice.TUnit.Net8.Core.Models;
 
 namespace Practice.TUnit.Net8.Core.Services;
@@ -19,33 +17,24 @@ public class CatalogExportService
     }
 
     /// <summary>
-    /// 將書籍列表匯出為 CSV 檔案
+    /// 將書籍清單匯出為 CSV 檔案
     /// </summary>
-    /// <param name="books">書籍列表</param>
+    /// <param name="books">書籍清單</param>
     /// <param name="filePath">輸出檔案路徑</param>
     /// <returns>匯出的書籍數量</returns>
     public async Task<int> ExportToCsvAsync(IEnumerable<Book> books, string filePath)
     {
         if (books == null)
+        {
             throw new ArgumentNullException(nameof(books));
+        }
 
         if (string.IsNullOrWhiteSpace(filePath))
-            throw new ArgumentException("File path cannot be empty", nameof(filePath));
+        {
+            throw new ArgumentException("File path is required", nameof(filePath));
+        }
 
         var bookList = books.ToList();
-        if (bookList.Count == 0)
-            throw new InvalidOperationException("Cannot export empty book list");
-
-        var sb = new StringBuilder();
-        sb.AppendLine("Id,Title,Author,Isbn,Genre,PublishedDate,Price,Status,PageCount");
-
-        foreach (var book in bookList)
-        {
-            sb.AppendLine(
-                $"\"{book.Id}\",\"{EscapeCsvField(book.Title)}\",\"{EscapeCsvField(book.Author)}\"," +
-                $"\"{book.Isbn}\",\"{book.Genre}\",\"{book.PublishedDate:yyyy-MM-dd}\"," +
-                $"{book.Price},{book.Status},{book.PageCount}");
-        }
 
         var directory = _fileSystem.Path.GetDirectoryName(filePath);
         if (!string.IsNullOrEmpty(directory) && !_fileSystem.Directory.Exists(directory))
@@ -53,42 +42,63 @@ public class CatalogExportService
             _fileSystem.Directory.CreateDirectory(directory);
         }
 
-        await _fileSystem.File.WriteAllTextAsync(filePath, sb.ToString());
+        var lines = new List<string>
+        {
+            "Id,Title,Author,ISBN,Genre,PublishedDate,Price,Status,PageCount"
+        };
+
+        foreach (var book in bookList)
+        {
+            var line = string.Join(",",
+                book.Id,
+                EscapeCsvField(book.Title),
+                EscapeCsvField(book.Author),
+                book.Isbn,
+                book.Genre,
+                book.PublishedDate.ToString("yyyy-MM-dd"),
+                book.Price,
+                book.Status,
+                book.PageCount);
+            lines.Add(line);
+        }
+
+        await _fileSystem.File.WriteAllLinesAsync(filePath, lines);
 
         return bookList.Count;
     }
 
     /// <summary>
-    /// 將書籍列表匯出為 JSON 檔案
+    /// 將書籍清單匯出為 JSON 檔案
     /// </summary>
-    /// <param name="books">書籍列表</param>
+    /// <param name="books">書籍清單</param>
     /// <param name="filePath">輸出檔案路徑</param>
     /// <returns>匯出的書籍數量</returns>
     public async Task<int> ExportToJsonAsync(IEnumerable<Book> books, string filePath)
     {
         if (books == null)
+        {
             throw new ArgumentNullException(nameof(books));
+        }
 
         if (string.IsNullOrWhiteSpace(filePath))
-            throw new ArgumentException("File path cannot be empty", nameof(filePath));
+        {
+            throw new ArgumentException("File path is required", nameof(filePath));
+        }
 
         var bookList = books.ToList();
-        if (bookList.Count == 0)
-            throw new InvalidOperationException("Cannot export empty book list");
-
-        var options = new JsonSerializerOptions
-        {
-            WriteIndented = true,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        };
-
-        var json = JsonSerializer.Serialize(bookList, options);
 
         var directory = _fileSystem.Path.GetDirectoryName(filePath);
         if (!string.IsNullOrEmpty(directory) && !_fileSystem.Directory.Exists(directory))
         {
             _fileSystem.Directory.CreateDirectory(directory);
         }
+
+        var json = System.Text.Json.JsonSerializer.Serialize(bookList,
+            new System.Text.Json.JsonSerializerOptions
+            {
+                WriteIndented = true,
+                PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+            });
 
         await _fileSystem.File.WriteAllTextAsync(filePath, json);
 
@@ -96,36 +106,45 @@ public class CatalogExportService
     }
 
     /// <summary>
-    /// 從 CSV 檔案匯入書籍
+    /// 從 CSV 檔案讀取書籍清單
     /// </summary>
-    /// <param name="filePath">CSV 檔案路徑</param>
-    /// <returns>匯入的書籍列表</returns>
+    /// <param name="filePath">檔案路徑</param>
+    /// <returns>書籍清單</returns>
     public async Task<IReadOnlyList<Book>> ImportFromCsvAsync(string filePath)
     {
         if (string.IsNullOrWhiteSpace(filePath))
-            throw new ArgumentException("File path cannot be empty", nameof(filePath));
+        {
+            throw new ArgumentException("File path is required", nameof(filePath));
+        }
 
         if (!_fileSystem.File.Exists(filePath))
-            throw new FileNotFoundException("CSV file not found", filePath);
+        {
+            throw new FileNotFoundException($"File not found: {filePath}", filePath);
+        }
 
-        var content = await _fileSystem.File.ReadAllTextAsync(filePath);
-        var lines = content.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var lines = await _fileSystem.File.ReadAllLinesAsync(filePath);
 
         if (lines.Length < 2)
-            throw new InvalidOperationException("CSV file is empty or has no data rows");
+        {
+            return Array.Empty<Book>();
+        }
 
         var books = new List<Book>();
 
         // 跳過標題列
         for (var i = 1; i < lines.Length; i++)
         {
-            var line = lines[i].Trim();
-            if (string.IsNullOrEmpty(line))
+            var line = lines[i];
+            if (string.IsNullOrWhiteSpace(line))
+            {
                 continue;
+            }
 
             var fields = ParseCsvLine(line);
             if (fields.Length < 9)
+            {
                 continue;
+            }
 
             try
             {
@@ -141,73 +160,74 @@ public class CatalogExportService
                     Status = Enum.Parse<BookStatus>(fields[7]),
                     PageCount = int.Parse(fields[8])
                 };
-
                 books.Add(book);
             }
             catch (FormatException)
             {
                 // 跳過格式錯誤的行
-                continue;
             }
         }
 
-        return books.AsReadOnly();
+        return books;
     }
 
     /// <summary>
-    /// 產生庫存報告
+    /// 產生庫存統計報告並寫入檔案
     /// </summary>
-    /// <param name="books">書籍列表</param>
+    /// <param name="books">書籍清單</param>
     /// <param name="filePath">輸出檔案路徑</param>
-    /// <returns>報告摘要</returns>
-    public async Task<InventoryReport> GenerateInventoryReportAsync(
-        IEnumerable<Book> books, string filePath)
+    /// <returns>報告內容</returns>
+    public async Task<string> GenerateInventoryReportAsync(IEnumerable<Book> books, string filePath)
     {
         if (books == null)
+        {
             throw new ArgumentNullException(nameof(books));
+        }
 
         if (string.IsNullOrWhiteSpace(filePath))
-            throw new ArgumentException("File path cannot be empty", nameof(filePath));
+        {
+            throw new ArgumentException("File path is required", nameof(filePath));
+        }
 
         var bookList = books.ToList();
 
-        var report = new InventoryReport
-        {
-            GeneratedAt = DateTime.UtcNow,
-            TotalBooks = bookList.Count,
-            AvailableBooks = bookList.Count(b => b.Status == BookStatus.Available),
-            OnLoanBooks = bookList.Count(b => b.Status == BookStatus.OnLoan),
-            ReservedBooks = bookList.Count(b => b.Status == BookStatus.Reserved),
-            ArchivedBooks = bookList.Count(b => b.Status == BookStatus.Archived),
-            GenreDistribution = bookList
-                .GroupBy(b => b.Genre)
-                .ToDictionary(g => g.Key.ToString(), g => g.Count()),
-            TotalValue = bookList.Sum(b => b.Price),
-            AveragePrice = bookList.Count > 0 ? bookList.Average(b => b.Price) : 0m
-        };
+        var report = new System.Text.StringBuilder();
+        report.AppendLine("=== 圖書館庫存統計報告 ===");
+        report.AppendLine($"統計日期：{DateTime.UtcNow:yyyy-MM-dd}");
+        report.AppendLine($"總藏書量：{bookList.Count} 冊");
+        report.AppendLine();
 
-        var sb = new StringBuilder();
-        sb.AppendLine("=== 圖書館庫存報告 ===");
-        sb.AppendLine($"產生時間: {report.GeneratedAt:yyyy-MM-dd HH:mm:ss}");
-        sb.AppendLine();
-        sb.AppendLine("── 書籍狀態 ──");
-        sb.AppendLine($"總計: {report.TotalBooks} 本");
-        sb.AppendLine($"可借閱: {report.AvailableBooks} 本");
-        sb.AppendLine($"已借出: {report.OnLoanBooks} 本");
-        sb.AppendLine($"已預約: {report.ReservedBooks} 本");
-        sb.AppendLine($"已封存: {report.ArchivedBooks} 本");
-        sb.AppendLine();
-        sb.AppendLine("── 類型分佈 ──");
-
-        foreach (var (genre, count) in report.GenreDistribution.OrderByDescending(x => x.Value))
+        // 狀態分布
+        report.AppendLine("--- 狀態分布 ---");
+        var statusGroups = bookList.GroupBy(b => b.Status)
+            .OrderBy(g => g.Key);
+        foreach (var group in statusGroups)
         {
-            sb.AppendLine($"{genre}: {count} 本");
+            report.AppendLine($"  {group.Key}: {group.Count()} 冊");
+        }
+        report.AppendLine();
+
+        // 類型分布
+        report.AppendLine("--- 類型分布 ---");
+        var genreGroups = bookList.GroupBy(b => b.Genre)
+            .OrderByDescending(g => g.Count());
+        foreach (var group in genreGroups)
+        {
+            report.AppendLine($"  {group.Key}: {group.Count()} 冊");
+        }
+        report.AppendLine();
+
+        // 價值統計
+        report.AppendLine("--- 價值統計 ---");
+        if (bookList.Count > 0)
+        {
+            report.AppendLine($"  總價值：${bookList.Sum(b => b.Price):N2}");
+            report.AppendLine($"  平均單價：${bookList.Average(b => b.Price):N2}");
+            report.AppendLine($"  最高單價：${bookList.Max(b => b.Price):N2}");
+            report.AppendLine($"  最低單價：${bookList.Min(b => b.Price):N2}");
         }
 
-        sb.AppendLine();
-        sb.AppendLine("── 價格統計 ──");
-        sb.AppendLine($"總價值: ${report.TotalValue:F2}");
-        sb.AppendLine($"平均價格: ${report.AveragePrice:F2}");
+        var reportContent = report.ToString();
 
         var directory = _fileSystem.Path.GetDirectoryName(filePath);
         if (!string.IsNullOrEmpty(directory) && !_fileSystem.Directory.Exists(directory))
@@ -215,70 +235,69 @@ public class CatalogExportService
             _fileSystem.Directory.CreateDirectory(directory);
         }
 
-        await _fileSystem.File.WriteAllTextAsync(filePath, sb.ToString());
+        await _fileSystem.File.WriteAllTextAsync(filePath, reportContent);
 
-        return report;
+        return reportContent;
     }
 
-    /// <summary>
-    /// 跳脫 CSV 欄位中的雙引號
-    /// </summary>
     private static string EscapeCsvField(string field)
     {
-        return field.Replace("\"", "\"\"");
+        if (field.Contains(',') || field.Contains('"') || field.Contains('\n'))
+        {
+            return $"\"{field.Replace("\"", "\"\"")}\"";
+        }
+
+        return field;
     }
 
-    /// <summary>
-    /// 解析 CSV 行（處理引號包圍的欄位）
-    /// </summary>
     private static string[] ParseCsvLine(string line)
     {
         var fields = new List<string>();
-        var current = new StringBuilder();
+        var current = new System.Text.StringBuilder();
         var inQuotes = false;
 
         for (var i = 0; i < line.Length; i++)
         {
-            if (line[i] == '"')
+            var c = line[i];
+
+            if (inQuotes)
             {
-                if (inQuotes && i + 1 < line.Length && line[i + 1] == '"')
+                if (c == '"')
                 {
-                    current.Append('"');
-                    i++;
+                    if (i + 1 < line.Length && line[i + 1] == '"')
+                    {
+                        current.Append('"');
+                        i++;
+                    }
+                    else
+                    {
+                        inQuotes = false;
+                    }
                 }
                 else
                 {
-                    inQuotes = !inQuotes;
+                    current.Append(c);
                 }
-            }
-            else if (line[i] == ',' && !inQuotes)
-            {
-                fields.Add(current.ToString());
-                current.Clear();
             }
             else
             {
-                current.Append(line[i]);
+                if (c == '"')
+                {
+                    inQuotes = true;
+                }
+                else if (c == ',')
+                {
+                    fields.Add(current.ToString());
+                    current.Clear();
+                }
+                else
+                {
+                    current.Append(c);
+                }
             }
         }
 
         fields.Add(current.ToString());
         return fields.ToArray();
     }
-}
-
-/// <summary>
-/// 庫存報告
-/// </summary>
-public class InventoryReport
-{
-    public DateTime GeneratedAt { get; set; }
-    public int TotalBooks { get; set; }
-    public int AvailableBooks { get; set; }
-    public int OnLoanBooks { get; set; }
-    public int ReservedBooks { get; set; }
-    public int ArchivedBooks { get; set; }
-    public Dictionary<string, int> GenreDistribution { get; set; } = new();
-    public decimal TotalValue { get; set; }
-    public decimal AveragePrice { get; set; }
 }

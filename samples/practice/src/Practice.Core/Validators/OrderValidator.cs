@@ -93,7 +93,9 @@ public class OrderValidator : AbstractValidator<Order>
     private static bool BeAfterCreatedAt(DateTimeOffset createdAt, DateTimeOffset? processedAt)
     {
         if (!processedAt.HasValue)
+        {
             return true;
+        }
 
         return processedAt.Value > createdAt;
     }

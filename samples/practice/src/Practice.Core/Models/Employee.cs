@@ -59,7 +59,9 @@ public class Employee
     public int GetYearsOfService(DateTime currentDate)
     {
         if (currentDate < HireDate)
+        {
             throw new ArgumentException("Current date cannot be before hire date", nameof(currentDate));
+        }
 
         return (currentDate - HireDate).Days / 365;
     }

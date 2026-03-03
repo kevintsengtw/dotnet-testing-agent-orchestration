@@ -23,7 +23,9 @@ public class SubscriptionService
     public bool IsSubscriptionActive(Subscription subscription)
     {
         if (subscription == null)
+        {
             throw new ArgumentNullException(nameof(subscription));
+        }
 
         var now = _timeProvider.GetUtcNow();
         return subscription.StartDate <= now && now <= subscription.EndDate;
@@ -37,11 +39,15 @@ public class SubscriptionService
     public int GetRemainingDays(Subscription subscription)
     {
         if (subscription == null)
+        {
             throw new ArgumentNullException(nameof(subscription));
+        }
 
         var now = _timeProvider.GetUtcNow();
         if (now > subscription.EndDate)
+        {
             return 0;
+        }
 
         return (subscription.EndDate - now).Days;
     }
@@ -54,11 +60,15 @@ public class SubscriptionService
     public bool IsExpiringSoon(Subscription subscription)
     {
         if (subscription == null)
+        {
             throw new ArgumentNullException(nameof(subscription));
+        }
 
         var now = _timeProvider.GetUtcNow();
         if (now > subscription.EndDate)
+        {
             return false;
+        }
 
         var daysRemaining = (subscription.EndDate - now).Days;
         return daysRemaining <= 7 && daysRemaining >= 0;
@@ -72,11 +82,15 @@ public class SubscriptionService
     public int GetUsedDays(Subscription subscription)
     {
         if (subscription == null)
+        {
             throw new ArgumentNullException(nameof(subscription));
+        }
 
         var now = _timeProvider.GetUtcNow();
         if (now < subscription.StartDate)
+        {
             return 0;
+        }
 
         var endPoint = now > subscription.EndDate ? subscription.EndDate : now;
         return (endPoint - subscription.StartDate).Days;
@@ -90,11 +104,15 @@ public class SubscriptionService
     public double GetUsagePercentage(Subscription subscription)
     {
         if (subscription == null)
+        {
             throw new ArgumentNullException(nameof(subscription));
+        }
 
         var totalDays = (subscription.EndDate - subscription.StartDate).TotalDays;
         if (totalDays <= 0)
+        {
             return 1.0;
+        }
 
         var usedDays = GetUsedDays(subscription);
         return Math.Min(usedDays / totalDays, 1.0);
@@ -109,10 +127,14 @@ public class SubscriptionService
     public Subscription RenewSubscription(Subscription subscription, int durationDays)
     {
         if (subscription == null)
+        {
             throw new ArgumentNullException(nameof(subscription));
+        }
 
         if (durationDays <= 0)
+        {
             throw new ArgumentException("Duration must be greater than zero", nameof(durationDays));
+        }
 
         var now = _timeProvider.GetUtcNow();
 
@@ -139,19 +161,27 @@ public class SubscriptionService
     public string GetSubscriptionStatus(Subscription subscription)
     {
         if (subscription == null)
+        {
             throw new ArgumentNullException(nameof(subscription));
+        }
 
         var now = _timeProvider.GetUtcNow();
 
         if (now < subscription.StartDate)
+        {
             return "尚未開始";
+        }
 
         if (now > subscription.EndDate)
+        {
             return "已過期";
+        }
 
         var remainingDays = GetRemainingDays(subscription);
         if (remainingDays <= 7)
+        {
             return $"即將到期（剩餘 {remainingDays} 天）";
+        }
 
         return "有效";
     }

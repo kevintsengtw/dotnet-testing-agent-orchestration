@@ -1,40 +1,6 @@
 namespace Practice.TUnit.Core.Models;
 
 /// <summary>
-/// 書籍狀態
-/// </summary>
-public enum BookStatus
-{
-    /// <summary>可借閱</summary>
-    Available,
-
-    /// <summary>已借出</summary>
-    OnLoan,
-
-    /// <summary>已預約</summary>
-    Reserved,
-
-    /// <summary>已下架</summary>
-    Archived
-}
-
-/// <summary>
-/// 書籍類型
-/// </summary>
-public enum BookGenre
-{
-    Fiction,
-    NonFiction,
-    Science,
-    Technology,
-    History,
-    Biography,
-    Children,
-    Art,
-    Reference
-}
-
-/// <summary>
 /// 書籍模型
 /// </summary>
 public class Book

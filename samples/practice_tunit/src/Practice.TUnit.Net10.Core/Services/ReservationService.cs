@@ -41,14 +41,18 @@ public class ReservationService
                    ?? throw new KeyNotFoundException($"Book '{bookId}' not found");
 
         if (book.Status != BookStatus.OnLoan)
+        {
             throw new InvalidOperationException(
                 "Book can only be reserved when it is currently on loan");
+        }
 
         var member = await _memberRepository.GetByIdAsync(memberId)
                      ?? throw new KeyNotFoundException($"Member '{memberId}' not found");
 
         if (!member.IsActive)
+        {
             throw new InvalidOperationException("Member account is inactive");
+        }
 
         var now = _timeProvider.GetUtcNow();
         var reservation = new Reservation
@@ -75,10 +79,14 @@ public class ReservationService
     public bool IsReservationExpired(Reservation reservation)
     {
         if (reservation == null)
+        {
             throw new ArgumentNullException(nameof(reservation));
+        }
 
         if (reservation.Status != ReservationStatus.Active)
+        {
             return false;
+        }
 
         var now = _timeProvider.GetUtcNow();
         return now > reservation.ExpiresAt;
@@ -92,10 +100,14 @@ public class ReservationService
     public TimeSpan GetRemainingTime(Reservation reservation)
     {
         if (reservation == null)
+        {
             throw new ArgumentNullException(nameof(reservation));
+        }
 
         if (reservation.Status != ReservationStatus.Active)
+        {
             return TimeSpan.Zero;
+        }
 
         var now = _timeProvider.GetUtcNow();
         var remaining = reservation.ExpiresAt - now;
@@ -111,14 +123,20 @@ public class ReservationService
     public async Task<Reservation> FulfillReservationAsync(Reservation reservation)
     {
         if (reservation == null)
+        {
             throw new ArgumentNullException(nameof(reservation));
+        }
 
         if (reservation.Status != ReservationStatus.Active)
+        {
             throw new InvalidOperationException(
                 $"Can only fulfill active reservations (current: {reservation.Status})");
+        }
 
         if (IsReservationExpired(reservation))
+        {
             throw new InvalidOperationException("Reservation has expired");
+        }
 
         reservation.Status = ReservationStatus.Fulfilled;
 
@@ -140,11 +158,15 @@ public class ReservationService
     public async Task<Reservation> CancelReservationAsync(Reservation reservation)
     {
         if (reservation == null)
+        {
             throw new ArgumentNullException(nameof(reservation));
+        }
 
         if (reservation.Status != ReservationStatus.Active)
+        {
             throw new InvalidOperationException(
                 $"Can only cancel active reservations (current: {reservation.Status})");
+        }
 
         reservation.Status = ReservationStatus.Cancelled;
 
@@ -166,10 +188,14 @@ public class ReservationService
     public bool IsExpiringSoon(Reservation reservation)
     {
         if (reservation == null)
+        {
             throw new ArgumentNullException(nameof(reservation));
+        }
 
         if (reservation.Status != ReservationStatus.Active)
+        {
             return false;
+        }
 
         var remaining = GetRemainingTime(reservation);
         return remaining > TimeSpan.Zero && remaining <= TimeSpan.FromHours(24);
@@ -183,7 +209,9 @@ public class ReservationService
     public async Task<int> ProcessExpiredReservationsAsync(IEnumerable<Reservation> reservations)
     {
         if (reservations == null)
+        {
             throw new ArgumentNullException(nameof(reservations));
+        }
 
         var expiredCount = 0;
 

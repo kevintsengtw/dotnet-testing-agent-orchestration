@@ -25,10 +25,14 @@ public class CatalogExportService
     public async Task<int> ExportToCsvAsync(IEnumerable<Book> books, string filePath)
     {
         if (books == null)
+        {
             throw new ArgumentNullException(nameof(books));
+        }
 
         if (string.IsNullOrWhiteSpace(filePath))
+        {
             throw new ArgumentException("File path is required", nameof(filePath));
+        }
 
         var bookList = books.ToList();
 
@@ -72,10 +76,14 @@ public class CatalogExportService
     public async Task<int> ExportToJsonAsync(IEnumerable<Book> books, string filePath)
     {
         if (books == null)
+        {
             throw new ArgumentNullException(nameof(books));
+        }
 
         if (string.IsNullOrWhiteSpace(filePath))
+        {
             throw new ArgumentException("File path is required", nameof(filePath));
+        }
 
         var bookList = books.ToList();
 
@@ -105,15 +113,21 @@ public class CatalogExportService
     public async Task<IReadOnlyList<Book>> ImportFromCsvAsync(string filePath)
     {
         if (string.IsNullOrWhiteSpace(filePath))
+        {
             throw new ArgumentException("File path is required", nameof(filePath));
+        }
 
         if (!_fileSystem.File.Exists(filePath))
+        {
             throw new FileNotFoundException($"File not found: {filePath}", filePath);
+        }
 
         var lines = await _fileSystem.File.ReadAllLinesAsync(filePath);
 
         if (lines.Length < 2)
+        {
             return Array.Empty<Book>();
+        }
 
         var books = new List<Book>();
 
@@ -122,11 +136,15 @@ public class CatalogExportService
         {
             var line = lines[i];
             if (string.IsNullOrWhiteSpace(line))
+            {
                 continue;
+            }
 
             var fields = ParseCsvLine(line);
             if (fields.Length < 9)
+            {
                 continue;
+            }
 
             try
             {
@@ -162,10 +180,14 @@ public class CatalogExportService
     public async Task<string> GenerateInventoryReportAsync(IEnumerable<Book> books, string filePath)
     {
         if (books == null)
+        {
             throw new ArgumentNullException(nameof(books));
+        }
 
         if (string.IsNullOrWhiteSpace(filePath))
+        {
             throw new ArgumentException("File path is required", nameof(filePath));
+        }
 
         var bookList = books.ToList();
 

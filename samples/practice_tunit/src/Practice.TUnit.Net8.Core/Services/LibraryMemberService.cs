@@ -4,8 +4,8 @@ using Practice.TUnit.Net8.Core.Models;
 namespace Practice.TUnit.Net8.Core.Services;
 
 /// <summary>
-/// 會員服務 — P3-2 驗證：Mock 依賴、MethodDataSource / Matrix 進階測試
-/// 管理會員註冊、驗證、升級等業務邏輯
+/// 圖書館會員服務 — P3-2 驗證：Mock 依賴 + 複雜驗證邏輯
+/// 需要使用 MethodDataSource / Matrix 進行多場景測試
 /// </summary>
 public class LibraryMemberService
 {
@@ -26,30 +26,44 @@ public class LibraryMemberService
     /// <summary>
     /// 註冊新會員
     /// </summary>
-    /// <param name="member">會員資料</param>
-    /// <returns>註冊後的會員</returns>
-    public async Task<LibraryMember> RegisterMemberAsync(LibraryMember member)
+    /// <param name="name">姓名</param>
+    /// <param name="email">電子郵件</param>
+    /// <param name="membershipType">會員類型</param>
+    /// <returns>新建會員</returns>
+    public async Task<LibraryMember> RegisterMemberAsync(string name, string email, MembershipType membershipType)
     {
-        if (member == null)
-            throw new ArgumentNullException(nameof(member));
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("Name is required", nameof(name));
+        }
 
-        if (string.IsNullOrWhiteSpace(member.Email))
-            throw new ArgumentException("Email is required", nameof(member));
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            throw new ArgumentException("Email is required", nameof(email));
+        }
 
-        if (!member.Email.Contains('@'))
-            throw new ArgumentException("Invalid email format", nameof(member));
+        if (!IsValidEmail(email))
+        {
+            throw new ArgumentException("Invalid email format", nameof(email));
+        }
 
-        var existing = await _memberRepository.GetByEmailAsync(member.Email);
-        if (existing != null)
-            throw new InvalidOperationException($"Member with email '{member.Email}' already exists");
+        var existingMember = await _memberRepository.GetByEmailAsync(email);
+        if (existingMember != null)
+        {
+            throw new InvalidOperationException($"Member with email '{email}' already exists");
+        }
 
-        member.Id = Guid.NewGuid();
-        member.JoinDate = DateTime.UtcNow;
-        member.IsActive = true;
-        member.MembershipType = MembershipType.Basic;
+        var member = new LibraryMember
+        {
+            Id = Guid.NewGuid(),
+            Name = name,
+            Email = email,
+            MembershipType = membershipType,
+            JoinDate = DateTime.UtcNow,
+            IsActive = true
+        };
 
         await _memberRepository.AddAsync(member);
-
         return member;
     }
 
@@ -61,38 +75,48 @@ public class LibraryMemberService
     public MemberValidationResult ValidateMember(LibraryMember member)
     {
         if (member == null)
+        {
             throw new ArgumentNullException(nameof(member));
+        }
 
         var errors = new List<string>();
 
         if (string.IsNullOrWhiteSpace(member.Name))
+        {
             errors.Add("Name is required");
-
-        if (member.Name?.Length > 100)
-            errors.Add("Name cannot exceed 100 characters");
+        }
+        else if (member.Name.Length < 2)
+        {
+            errors.Add("Name must be at least 2 characters");
+        }
+        else if (member.Name.Length > 100)
+        {
+            errors.Add("Name must not exceed 100 characters");
+        }
 
         if (string.IsNullOrWhiteSpace(member.Email))
+        {
             errors.Add("Email is required");
-        else if (!member.Email.Contains('@'))
-            errors.Add("Invalid email format");
+        }
+        else if (!IsValidEmail(member.Email))
+        {
+            errors.Add("Email format is invalid");
+        }
 
         if (member.JoinDate > DateTime.UtcNow)
-            errors.Add("Join date cannot be in the future");
-
-        if (member.JoinDate < new DateTime(2000, 1, 1))
-            errors.Add("Join date is too far in the past");
-
-        if (!string.IsNullOrEmpty(member.PhoneNumber))
         {
-            var digitsOnly = new string(member.PhoneNumber.Where(char.IsDigit).ToArray());
-            if (digitsOnly.Length < 8 || digitsOnly.Length > 15)
-                errors.Add("Phone number must be between 8 and 15 digits");
+            errors.Add("Join date cannot be in the future");
+        }
+
+        if (member.PhoneNumber != null && member.PhoneNumber.Length < 8)
+        {
+            errors.Add("Phone number must be at least 8 digits");
         }
 
         return new MemberValidationResult
         {
             IsValid = errors.Count == 0,
-            Errors = errors.AsReadOnly()
+            Errors = errors
         };
     }
 
@@ -100,7 +124,7 @@ public class LibraryMemberService
     /// 升級會員等級
     /// </summary>
     /// <param name="memberId">會員 ID</param>
-    /// <param name="newType">新等級</param>
+    /// <param name="newType">新會員類型</param>
     /// <returns>升級後的會員</returns>
     public async Task<LibraryMember> UpgradeMembershipAsync(Guid memberId, MembershipType newType)
     {
@@ -108,11 +132,15 @@ public class LibraryMemberService
                      ?? throw new KeyNotFoundException($"Member '{memberId}' not found");
 
         if (!member.IsActive)
+        {
             throw new InvalidOperationException("Cannot upgrade inactive member");
+        }
 
         if (newType <= member.MembershipType)
+        {
             throw new InvalidOperationException(
-                $"New membership type ({newType}) must be higher than current ({member.MembershipType})");
+                $"New type '{newType}' must be higher than current type '{member.MembershipType}'");
+        }
 
         member.MembershipType = newType;
         await _memberRepository.UpdateAsync(member);
@@ -121,36 +149,45 @@ public class LibraryMemberService
     }
 
     /// <summary>
-    /// 檢查會員是否可以借書
+    /// 檢查會員是否可借閱
     /// </summary>
     /// <param name="memberId">會員 ID</param>
-    /// <returns>是否可借書</returns>
-    public async Task<bool> CanBorrowAsync(Guid memberId)
+    /// <returns>是否可借閱及原因</returns>
+    public async Task<(bool CanBorrow, string? Reason)> CanBorrowAsync(Guid memberId)
     {
-        var member = await _memberRepository.GetByIdAsync(memberId)
-                     ?? throw new KeyNotFoundException($"Member '{memberId}' not found");
+        var member = await _memberRepository.GetByIdAsync(memberId);
+        if (member == null)
+        {
+            return (false, "Member not found");
+        }
 
         if (!member.IsActive)
-            return false;
+        {
+            return (false, "Member account is inactive");
+        }
 
         var activeLoans = await _loanRepository.GetActiveLoansByMemberAsync(memberId);
         if (activeLoans.Count >= member.MaxBooksAllowed)
-            return false;
+        {
+            return (false, $"Maximum loan limit reached ({member.MaxBooksAllowed} books)");
+        }
 
-        // 檢查是否有逾期未還的書
-        if (activeLoans.Any(l => l.Status == LoanStatus.Overdue))
-            return false;
+        var hasOverdue = activeLoans.Any(l => l.Status == LoanStatus.Overdue);
+        if (hasOverdue)
+        {
+            return (false, "Member has overdue books");
+        }
 
-        return true;
+        return (true, null);
     }
 
     /// <summary>
-    /// 計算年費
+    /// 計算會員年費
     /// </summary>
-    /// <param name="membershipType">會員等級</param>
+    /// <param name="membershipType">會員類型</param>
     /// <param name="isRenewal">是否為續約</param>
     /// <returns>年費金額</returns>
-    public decimal CalculateAnnualFee(MembershipType membershipType, bool isRenewal = false)
+    public decimal CalculateAnnualFee(MembershipType membershipType, bool isRenewal)
     {
         var baseFee = membershipType switch
         {
@@ -160,19 +197,20 @@ public class LibraryMemberService
             _ => throw new ArgumentOutOfRangeException(nameof(membershipType))
         };
 
-        // 續約享 10% 折扣
-        if (isRenewal && baseFee > 0)
-            baseFee *= 0.9m;
-
-        return baseFee;
+        // 續約享 9 折優惠
+        return isRenewal ? baseFee * 0.9m : baseFee;
     }
-}
 
-/// <summary>
-/// 會員驗證結果
-/// </summary>
-public class MemberValidationResult
-{
-    public bool IsValid { get; set; }
-    public IReadOnlyList<string> Errors { get; set; } = Array.Empty<string>();
+    private static bool IsValidEmail(string email)
+    {
+        try
+        {
+            var addr = new System.Net.Mail.MailAddress(email);
+            return addr.Address == email;
+        }
+        catch
+        {
+            return false;
+        }
+    }
 }
