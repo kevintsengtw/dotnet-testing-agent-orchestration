@@ -5,15 +5,37 @@
 
 ---
 
+## 可驗證版本
+
+本指南以 **.NET 9.0** 為基線版本。三個版本的驗證專案結構完全相同，可自由選擇：
+
+| 版本        | .slnx                        | AppHost 路徑                                        |
+| ----------- | ---------------------------- | --------------------------------------------------- |
+| **.NET 9.0** | `Practice.Aspire.slnx`      | `practice_aspire/src/Practice.Aspire.AppHost/`      |
+| .NET 8.0    | `Practice.Aspire.Net8.slnx` | `practice_aspire/src/Practice.Aspire.Net8.AppHost/` |
+| .NET 10.0   | `Practice.Aspire.Net10.slnx` | `practice_aspire/src/Practice.Aspire.Net10.AppHost/` |
+
+> 驗證其他版本時，將情境中的檔案路徑替換為對應版本的專案路徑即可。例如：
+> `#file:practice_aspire/src/Practice.Aspire.Net8.AppHost/Program.cs`
+
+### 還原驗證結果
+
+```powershell
+git restore samples/practice_aspire/tests/
+git clean -fd samples/practice_aspire/tests/
+```
+
+---
+
 ## 前置準備
 
-| 項目                | 說明                                           |
-| ------------------- | ---------------------------------------------- |
-| **VS Code**         | 1.109 以上，已安裝 GitHub Copilot Chat         |
-| **VS Code 設定**    | `chat.customAgentInSubagent.enabled: true`     |
-| **.NET SDK**        | .NET 9.0 SDK                                   |
-| **Docker Desktop**  | 必須執行中（Aspire Resource 容器需要）         |
-| **Aspire Workload** | 必須安裝（`dotnet workload install aspire`）   |
+| 項目                | 說明                                         |
+| ------------------- | -------------------------------------------- |
+| **VS Code**         | 1.109 以上，已安裝 GitHub Copilot Chat       |
+| **VS Code 設定**    | `chat.customAgentInSubagent.enabled: true`   |
+| **.NET SDK**        | .NET 9.0 SDK                                 |
+| **Docker Desktop**  | 必須執行中（Aspire Resource 容器需要）       |
+| **Aspire Workload** | 必須安裝（`dotnet workload install aspire`） |
 
 ## 操作步驟
 
@@ -63,31 +85,4 @@
 - **Executor**：容器啟動順序（先 SQL Server → 再 Redis → 最後 bookingapi）是否正確
 - **Reviewer**：BookingsController 的 CRUD 端點測試覆蓋是否完整
 
----
 
-## 跨版本驗證
-
-主要驗證使用 .NET 9.0 版本。如需驗證其他版本，請使用對應的專案路徑：
-
-| 版本        | .slnx                        | AppHost 路徑                                  |
-| ----------- | ---------------------------- | --------------------------------------------- |
-| **.NET 9.0** | `Practice.Aspire.slnx`      | `practice_aspire/src/Practice.Aspire.AppHost/` |
-| .NET 8.0    | `Practice.Aspire.Net8.slnx` | `practice_aspire/src/Practice.Aspire.Net8.AppHost/` |
-| .NET 10.0   | `Practice.Aspire.Net10.slnx` | `practice_aspire/src/Practice.Aspire.Net10.AppHost/` |
-
-跨版本驗證時，將情境中的檔案路徑替換為對應版本的專案路徑即可。例如：
-
-```plaintext
-#file:practice_aspire/src/Practice.Aspire.Net8.AppHost/Program.cs
-
-測試 bookingapi 服務的所有 API 端點
-```
-
----
-
-## 還原驗證結果
-
-```powershell
-git restore samples/practice_aspire/tests/
-git clean -fd samples/practice_aspire/tests/
-```

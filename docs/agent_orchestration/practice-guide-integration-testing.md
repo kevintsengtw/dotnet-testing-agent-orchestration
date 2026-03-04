@@ -5,6 +5,28 @@
 
 ---
 
+## 可驗證版本
+
+本指南以 **.NET 9.0** 為基線版本。三個版本的驗證專案結構完全相同，可自由選擇：
+
+| 版本         | .slnx                             | 來源專案路徑                                                  |
+| ------------ | --------------------------------- | ------------------------------------------------------------- |
+| **.NET 9.0** | `Practice.Integration.slnx`       | `practice_integration/src/Practice.Integration.WebApi/`       |
+| .NET 8.0     | `Practice.Integration.Net8.slnx`  | `practice_integration/src/Practice.Integration.WebApi.Net8/`  |
+| .NET 10.0    | `Practice.Integration.Net10.slnx` | `practice_integration/src/Practice.Integration.WebApi.Net10/` |
+
+> 驗證其他版本時，將情境中的檔案路徑替換為對應版本的專案路徑即可。例如：
+> `#file:practice_integration/src/Practice.Integration.WebApi.Net8/Controllers/OrdersController.cs`
+
+### 還原驗證結果
+
+```powershell
+git restore samples/practice_integration/tests/
+git clean -fd samples/practice_integration/tests/
+```
+
+---
+
 ## 前置準備
 
 | 項目               | 說明                                       |
@@ -81,31 +103,4 @@
 - **Executor**：MongoDB 容器啟動是否正常，文件型資料的 CRUD 是否通過
 - **Reviewer**：NoSQL 資料隔離策略是否合理（例如每測試清理 Collection）
 
----
 
-## 跨版本驗證
-
-主要驗證使用 .NET 9.0 版本。如需驗證其他版本，請使用對應的專案路徑：
-
-| 版本        | .slnx                              | 來源專案路徑                                       |
-| ----------- | ---------------------------------- | -------------------------------------------------- |
-| **.NET 9.0** | `Practice.Integration.slnx`       | `practice_integration/src/Practice.Integration.WebApi/` |
-| .NET 8.0    | `Practice.Integration.Net8.slnx`  | `practice_integration/src/Practice.Integration.WebApi.Net8/` |
-| .NET 10.0   | `Practice.Integration.Net10.slnx` | `practice_integration/src/Practice.Integration.WebApi.Net10/` |
-
-跨版本驗證時，將情境中的檔案路徑替換為對應版本的專案路徑即可。例如：
-
-```plaintext
-#file:practice_integration/src/Practice.Integration.WebApi.Net8/Controllers/OrdersController.cs
-
-測試 OrdersController 的所有 CRUD 端點
-```
-
----
-
-## 還原驗證結果
-
-```powershell
-git restore samples/practice_integration/tests/
-git clean -fd samples/practice_integration/tests/
-```

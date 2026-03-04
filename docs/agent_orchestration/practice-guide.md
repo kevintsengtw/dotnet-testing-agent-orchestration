@@ -36,12 +36,12 @@
 
 > **主要驗證版本為 .NET 9.0**（基線版本）。每個驗證專案另提供 .NET 8.0 與 .NET 10.0 版本，供跨版本驗證使用，詳見各文件末尾的「跨版本驗證」章節。
 
-| 驗證專案                        | Orchestrator                                       | 測試類型        | 操作指南                                                              |
-| ------------------------------- | -------------------------------------------------- | --------------- | --------------------------------------------------------------------- |
-| `samples/practice/`             | `dotnet-testing-orchestrator`                      | 單元測試        | [practice-guide-unit-testing.md](practice-guide-unit-testing.md)             |
+| 驗證專案                        | Orchestrator                                       | 測試類型        | 操作指南                                                                       |
+| ------------------------------- | -------------------------------------------------- | --------------- | ------------------------------------------------------------------------------ |
+| `samples/practice/`             | `dotnet-testing-orchestrator`                      | 單元測試        | [practice-guide-unit-testing.md](practice-guide-unit-testing.md)               |
 | `samples/practice_integration/` | `dotnet-testing-advanced-integration-orchestrator` | 整合測試        | [practice-guide-integration-testing.md](practice-guide-integration-testing.md) |
-| `samples/practice_aspire/`      | `dotnet-testing-advanced-aspire-orchestrator`      | Aspire 整合測試 | [practice-guide-aspire-testing.md](practice-guide-aspire-testing.md)         |
-| `samples/practice_tunit/`       | `dotnet-testing-advanced-tunit-orchestrator`       | TUnit 測試      | [practice-guide-tunit-testing.md](practice-guide-tunit-testing.md)           |
+| `samples/practice_aspire/`      | `dotnet-testing-advanced-aspire-orchestrator`      | Aspire 整合測試 | [practice-guide-aspire-testing.md](practice-guide-aspire-testing.md)           |
+| `samples/practice_tunit/`       | `dotnet-testing-advanced-tunit-orchestrator`       | TUnit 測試      | [practice-guide-tunit-testing.md](practice-guide-tunit-testing.md)             |
 
 ---
 
