@@ -64,7 +64,7 @@ flowchart TD
 | 項目          | 說明                                                                           |
 | ------------- | ------------------------------------------------------------------------------ |
 | **模型配置**  | Claude Sonnet 4.6 / Claude Opus 4.6（Fallback）                                |
-| **工具**      | `agent`, `read`, `search`, `usages`, `listDir`                                 |
+| **工具**      | `agent`, `read`, `search`, `usages`, `search/listDirectory`                    |
 | **Subagents** | `dotnet-testing-advanced-aspire-analyzer`, `-writer`, `-executor`, `-reviewer` |
 | **Skills**    | 單一 Skill：`aspire-testing`                                                   |
 
@@ -187,7 +187,7 @@ Reviewer 審查測試程式碼的品質，重點包含：
 
 | Subagent            | 角色   | 主要職責                                                             | 核心工具                                |
 | ------------------- | ------ | -------------------------------------------------------------------- | --------------------------------------- |
-| **aspire-analyzer** | 分析者 | 分析 AppHost Resource 定義、專案引用、依賴圖                         | `read`, `search`, `listDir`             |
+| **aspire-analyzer** | 分析者 | 分析 AppHost Resource 定義、專案引用、依賴圖                         | `read`, `search`, `search/listDirectory` |
 | **aspire-writer**   | 撰寫者 | 載入 aspire-testing Skill，建立 AspireAppFixture、TestBase、測試類別 | `read`, `search`, `edit`, `runCommands` |
 | **aspire-executor** | 執行者 | Docker + Aspire Workload 環境檢查、`dotnet test` 執行                | `read`, `edit`, `runCommands`           |
 | **aspire-reviewer** | 審查者 | 審查 Aspire 測試品質、Resource 配置、資料隔離                        | `read`, `search`                        |

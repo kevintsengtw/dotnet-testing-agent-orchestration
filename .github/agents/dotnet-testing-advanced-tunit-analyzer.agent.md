@@ -2,7 +2,7 @@
 name: dotnet-testing-advanced-tunit-analyzer
 description: '分析 .NET 被測試目標的類別結構、依賴項，判斷 TUnit 功能需求，產出 TUnit 測試分析報告'
 user-invokable: false
-tools: ['read', 'search', 'usages', 'listDir']
+tools: ['read', 'search', 'search/usages', 'search/listDirectory']
 model: Claude Sonnet 4.6 (copilot)
 ---
 
@@ -39,7 +39,7 @@ model: Claude Sonnet 4.6 (copilot)
 1. **定位 `.csproj` 檔案**（依序嘗試三種方法）：
    - 方法一：若 Orchestrator 已提供 `sourceProjectPath`，直接讀取該 `.csproj`
    - 方法二：從被測試目標的檔案路徑向上查找，找到最近的 `.csproj`
-   - 方法三：使用 `listDir` 或 `search` 在 `src/` 目錄下搜尋 `.csproj`
+   - 方法三：使用 `search/listDirectory` 或 `search` 在 `src/` 目錄下搜尋 `.csproj`
 
 2. **提取 `<TargetFramework>` 值**：
    - 讀取 `.csproj` 檔案，擷取 `<TargetFramework>` 的值（如 `net8.0`、`net9.0`、`net10.0`）

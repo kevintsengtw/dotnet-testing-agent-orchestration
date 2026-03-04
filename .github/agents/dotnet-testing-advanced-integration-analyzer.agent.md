@@ -2,7 +2,7 @@
 name: dotnet-testing-advanced-integration-analyzer
 description: '分析 .NET WebAPI 專案的端點結構、資料層依賴、容器需求，產出整合測試分析報告'
 user-invokable: false
-tools: ['read', 'search', 'usages', 'listDir']
+tools: ['read', 'search', 'search/usages', 'search/listDirectory']
 model: Claude Sonnet 4.6 (copilot)
 ---
 

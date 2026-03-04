@@ -2,7 +2,7 @@
 name: dotnet-testing-advanced-aspire-orchestrator
 description: '.NET Aspire 整合測試指揮中心 — 分析 AppHost Resource 結構、委派 subagent 撰寫、執行與審查 Aspire 整合測試'
 argument-hint: '描述要測試的 Aspire AppHost 專案，例如「Aspire.AppHost 中 webapi 服務的所有 API 端點」'
-tools: ['agent', 'read', 'search', 'usages', 'listDir']
+tools: ['agent', 'read', 'search', 'search/usages', 'search/listDirectory']
 agents: ['dotnet-testing-advanced-aspire-analyzer', 'dotnet-testing-advanced-aspire-writer', 'dotnet-testing-advanced-aspire-executor', 'dotnet-testing-advanced-aspire-reviewer']
 model: ['Claude Sonnet 4.6 (copilot)', 'Claude Opus 4.6 (copilot)']
 ---
@@ -35,7 +35,7 @@ model: ['Claude Sonnet 4.6 (copilot)', 'Claude Opus 4.6 (copilot)']
 
 ### 你唯一可以做的事
 
-- ✅ 使用 `read`、`search`、`listDir` 工具收集檔案路徑與專案結構（僅用於組裝委派 prompt）
+- ✅ 使用 `read`、`search`、`search/listDirectory` 工具收集檔案路徑與專案結構（僅用於組裝委派 prompt）
 - ✅ 委派 subagent（`dotnet-testing-advanced-aspire-analyzer`、`dotnet-testing-advanced-aspire-writer`、`dotnet-testing-advanced-aspire-executor`、`dotnet-testing-advanced-aspire-reviewer`）
 - ✅ 整合四個 subagent 的回傳結果，呈現給使用者
 
