@@ -2,7 +2,7 @@
 name: dotnet-testing-analyzer
 description: '分析 .NET 被測試目標的類別結構、依賴項、需要的測試技術'
 user-invokable: false
-tools: ['read', 'search', 'usages', 'listDir']
+tools: ['read', 'search', 'search/usages', 'search/listDirectory']
 model: Claude Sonnet 4.6 (copilot)
 ---
 
@@ -17,7 +17,7 @@ model: Claude Sonnet 4.6 (copilot)
 ### Step 1：定位被測試目標
 
 1. 使用 `read` 工具讀取 Orchestrator 指定的被測試目標檔案
-2. 如果路徑不明確，使用 `search` 或 `listDir` 在 `src/` 目錄下搜尋目標類別
+2. 如果路徑不明確，使用 `search` 或 `search/listDirectory` 在 `src/` 目錄下搜尋目標類別
 3. 確保完整讀取目標類別的所有程式碼
 
 ### Step 1.2：偵測目標專案環境（強制執行）
@@ -27,7 +27,7 @@ model: Claude Sonnet 4.6 (copilot)
 1. **定位 `.csproj` 檔案**（依序嘗試三種方法）：
    - 方法一：若 Orchestrator 已提供 `sourceProjectPath`，直接讀取該 `.csproj`
    - 方法二：從被測試目標的檔案路徑向上查找，找到最近的 `.csproj`
-   - 方法三：使用 `listDir` 或 `search` 在 `src/` 目錄下搜尋 `.csproj`
+   - 方法三：使用 `search/listDirectory` 或 `search` 在 `src/` 目錄下搜尋 `.csproj`
 
 2. **提取 `<TargetFramework>` 值**：
    - 讀取 `.csproj` 檔案，擷取 `<TargetFramework>` 的值（如 `net8.0`、`net9.0`、`net10.0`）
@@ -177,7 +177,7 @@ model: Claude Sonnet 4.6 (copilot)
 
 在產生 `requiredTechniques` 之前，你**必須**先掃描測試專案中已存在的測試檔案和基礎設施：
 
-1. 使用 `listDir` 查看測試專案的目錄結構
+1. 使用 `search/listDirectory` 查看測試專案的目錄結構
 2. 使用 `search` 搜尋 `AutoDataWithCustomization`、`InlineAutoDataWithCustomization`、`FakeTimeProviderExtensions`、`ITestOutputHelper` 等關鍵字
 3. 如果找到既有的 AutoFixture 自訂 Attribute 或 Extension Method，**必須**將對應技術加入 `requiredTechniques`
 4. 使用 `read` 讀取至少一個同專案下已存在的測試檔案，了解既有的測試 pattern

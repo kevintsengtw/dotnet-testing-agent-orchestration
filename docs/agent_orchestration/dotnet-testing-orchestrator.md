@@ -64,7 +64,7 @@ flowchart TD
 | 項目          | 說明                                                                                                     |
 | ------------- | -------------------------------------------------------------------------------------------------------- |
 | **模型配置**  | Claude Sonnet 4.6 / Claude Opus 4.6（Fallback）                                                          |
-| **工具**      | `agent`, `read`, `search`, `usages`, `listDir`                                                           |
+| **工具**      | `agent`, `read`, `search`, `usages`, `search/listDirectory`                                              |
 | **Subagents** | `dotnet-testing-analyzer`, `dotnet-testing-writer`, `dotnet-testing-executor`, `dotnet-testing-reviewer` |
 
 ---
@@ -176,7 +176,7 @@ Orchestrator 將測試程式碼交給 `dotnet-testing-reviewer` 審查。
 
 | Subagent                    | 角色   | 主要職責                                               | 核心工具                                |
 | --------------------------- | ------ | ------------------------------------------------------ | --------------------------------------- |
-| **dotnet-testing-analyzer** | 分析者 | 分析被測試目標的依賴、方法、目標類型，回傳結構化報告   | `read`, `search`, `listDir`             |
+| **dotnet-testing-analyzer** | 分析者 | 分析被測試目標的依賴、方法、目標類型，回傳結構化報告   | `read`, `search`, `search/listDirectory` |
 | **dotnet-testing-writer**   | 撰寫者 | 載入 Agent Skills，依據分析報告撰寫測試程式碼          | `read`, `search`, `edit`, `runCommands` |
 | **dotnet-testing-executor** | 執行者 | 執行 `dotnet build` + `dotnet test`，修正編譯/執行錯誤 | `read`, `edit`, `runCommands`           |
 | **dotnet-testing-reviewer** | 審查者 | 審查測試程式碼品質，驗證覆蓋率與命名規範               | `read`, `search`                        |

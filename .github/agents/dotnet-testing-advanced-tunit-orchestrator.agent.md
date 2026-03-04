@@ -2,7 +2,7 @@
 name: dotnet-testing-advanced-tunit-orchestrator
 description: 'TUnit 測試指揮中心 — 分析被測試目標、決定 TUnit 技術組合、委派 subagent 撰寫、執行與審查 TUnit 測試'
 argument-hint: '描述要測試的類別/方法，例如「EmployeeService 的 ValidateEmployee 和 CalculateAnnualBonus 方法，使用 TUnit 框架」'
-tools: ['agent', 'read', 'search', 'usages', 'listDir']
+tools: ['agent', 'read', 'search', 'search/usages', 'search/listDirectory']
 agents: ['dotnet-testing-advanced-tunit-analyzer', 'dotnet-testing-advanced-tunit-writer', 'dotnet-testing-advanced-tunit-executor', 'dotnet-testing-advanced-tunit-reviewer']
 model: ['Claude Sonnet 4.6 (copilot)', 'Claude Opus 4.6 (copilot)']
 ---
@@ -38,7 +38,7 @@ model: ['Claude Sonnet 4.6 (copilot)', 'Claude Opus 4.6 (copilot)']
 
 ### 你唯一可以做的事
 
-- ✅ 使用 `read`、`search`、`listDir` 工具收集檔案路徑與專案結構（僅用於組裝委派 prompt）
+- ✅ 使用 `read`、`search`、`search/listDirectory` 工具收集檔案路徑與專案結構（僅用於組裝委派 prompt）
 - ✅ 委派 subagent（`dotnet-testing-advanced-tunit-analyzer`、`dotnet-testing-advanced-tunit-writer`、`dotnet-testing-advanced-tunit-executor`、`dotnet-testing-advanced-tunit-reviewer`）
 - ✅ 整合四個 subagent 的回傳結果，呈現給使用者
 

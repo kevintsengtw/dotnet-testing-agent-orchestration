@@ -2,7 +2,7 @@
 name: dotnet-testing-advanced-tunit-reviewer
 description: '審查 TUnit 測試的品質，載入品質相關 Skills 驗證命名、斷言、TUnit 合規性等最佳實踐'
 user-invokable: false
-tools: ['read', 'search', 'listDir', 'runCommands']
+tools: ['read', 'search', 'search/listDirectory', 'execute/getTerminalOutput','execute/runInTerminal','read/terminalLastCommand','read/terminalSelection']
 model: ['Claude Sonnet 4.6 (copilot)', 'GPT-5.1-Codex-Max (copilot)']
 ---
 
@@ -41,7 +41,7 @@ model: ['Claude Sonnet 4.6 (copilot)', 'GPT-5.1-Codex-Max (copilot)']
 
 ### Step 2：讀取所有測試檔案
 
-使用 `listDir` 定位測試專案目錄，然後使用 `read` 逐一讀取所有測試檔案。
+使用 `search/listDirectory` 定位測試專案目錄，然後使用 `read` 逐一讀取所有測試檔案。
 
 需要讀取的檔案：
 

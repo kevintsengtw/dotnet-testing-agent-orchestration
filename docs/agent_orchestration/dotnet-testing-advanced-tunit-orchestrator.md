@@ -65,7 +65,7 @@ flowchart TD
 | 項目          | 說明                                                                          |
 | ------------- | ----------------------------------------------------------------------------- |
 | **模型配置**  | Claude Sonnet 4.6 / Claude Opus 4.6（Fallback）                               |
-| **工具**      | `agent`, `read`, `search`, `usages`, `listDir`                                |
+| **工具**      | `agent`, `read`, `search`, `usages`, `search/listDirectory`                   |
 | **Subagents** | `dotnet-testing-advanced-tunit-analyzer`, `-writer`, `-executor`, `-reviewer` |
 | **Skills**    | `tunit-fundamentals`（必載）+ `tunit-advanced`（條件載入）                    |
 
@@ -201,7 +201,7 @@ Reviewer 除了一般品質審查外，還會進行 **TUnit 合規性檢查**：
 
 | Subagent           | 角色   | 主要職責                                                           | 核心工具                                |
 | ------------------ | ------ | ------------------------------------------------------------------ | --------------------------------------- |
-| **tunit-analyzer** | 分析者 | 分析被測試目標、偵測遷移需求、評估 TUnit 功能需求                  | `read`, `search`, `listDir`             |
+| **tunit-analyzer** | 分析者 | 分析被測試目標、偵測遷移需求、評估 TUnit 功能需求                  | `read`, `search`, `search/listDirectory` |
 | **tunit-writer**   | 撰寫者 | 載入 TUnit Skills，撰寫符合 TUnit 規範的測試程式碼                 | `read`, `search`, `edit`, `runCommands` |
 | **tunit-executor** | 執行者 | `dotnet build` + `dotnet run` 執行測試，處理 Source Generator 問題 | `read`, `edit`, `runCommands`           |
 | **tunit-reviewer** | 審查者 | 品質審查 + TUnit 合規性檢查                                        | `read`, `search`                        |

@@ -2,7 +2,7 @@
 name: dotnet-testing-advanced-tunit-executor
 description: '建置與執行 TUnit 測試，處理 Source Generator 建置、dotnet run 執行、編譯錯誤與測試失敗的修正迴圈'
 user-invokable: false
-tools: ['read', 'search', 'edit', 'runCommands', 'runTasks']
+tools: ['read', 'search', 'edit', 'execute/getTerminalOutput', 'execute/runInTerminal', 'read/terminalLastCommand', 'read/terminalSelection', 'execute/createAndRunTask']
 model: Claude Sonnet 4.6 (copilot)
 ---
 
