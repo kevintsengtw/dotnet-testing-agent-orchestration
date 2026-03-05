@@ -55,6 +55,8 @@ git clean -fd samples/practice/tests/
 
 ```plaintext
 #file:practice/src/Practice.Core/TemperatureConverter.cs
+
+為 TemperatureConverter 類別寫單元測試
 ```
 
 > 驗證 Orchestrator 對無依賴純函式的基本完整流程：Analyzer 分析 → Writer 撰寫 → Executor 執行 → Reviewer 審查。
@@ -72,6 +74,8 @@ git clean -fd samples/practice/tests/
 
 ```plaintext
 #file:practice/src/Practice.Core/Services/WeatherAlertService.cs
+
+為 WeatherAlertService 寫單元測試
 ```
 
 > 驗證 Analyzer 是否識別 `IWeatherService` 和 `INotificationService` 兩個外部依賴，Writer 是否載入 `nsubstitute-mocking` Skill。
@@ -88,6 +92,8 @@ git clean -fd samples/practice/tests/
 
 ```plaintext
 #file:practice/src/Practice.Core/Services/EmployeeService.cs
+
+為 EmployeeService 寫單元測試
 ```
 
 > 驗證 Writer 是否載入 `autofixture-basics` 和 `bogus-fake-data` Skills，使用自動產生的測試資料。
@@ -104,6 +110,8 @@ git clean -fd samples/practice/tests/
 
 ```plaintext
 #file:practice/src/Practice.Core/Services/SubscriptionService.cs
+
+為 SubscriptionService 寫單元測試
 ```
 
 > 驗證 Analyzer 是否偵測到 `TimeProvider` 依賴，Writer 是否載入 `datetime-testing-timeprovider` Skill 使用 `FakeTimeProvider`。
@@ -120,6 +128,8 @@ git clean -fd samples/practice/tests/
 
 ```plaintext
 #file:practice/src/Practice.Core/Services/ConfigurationLoader.cs
+
+為 ConfigurationLoader 寫單元測試
 ```
 
 > 驗證 Analyzer 是否偵測到 `IFileSystem` 依賴，Writer 是否載入 `filesystem-testing-abstractions` Skill 使用 `MockFileSystem`。
@@ -136,6 +146,8 @@ git clean -fd samples/practice/tests/
 
 ```plaintext
 #file:practice/src/Practice.Core/Validators/OrderValidator.cs
+
+為 OrderValidator 寫單元測試
 ```
 
 > 驗證 Analyzer 是否偵測到 `AbstractValidator<T>` 基底類別，Writer 是否載入 `fluentvalidation-testing` Skill。
@@ -152,6 +164,8 @@ git clean -fd samples/practice/tests/
 
 ```plaintext
 #file:practice/src/Practice.Core/Validators/EmployeeValidator.cs
+
+為 EmployeeValidator 寫單元測試
 ```
 
 > 驗證對不同 Validator 目標的泛化能力，確認 Writer 能正確處理含 `TimeProvider` 依賴的 Validator。
@@ -168,6 +182,8 @@ git clean -fd samples/practice/tests/
 
 ```plaintext
 #file:practice/src/Practice.Core/Services/OrderProcessingService.cs
+
+為 OrderProcessingService 寫單元測試
 ```
 
 > 驗證 Analyzer 能否同時識別四個依賴（`IOrderRepository`、`IPaymentGateway`、`IEmailService`、`TimeProvider`），Writer 是否整合多個 Skills。
@@ -184,6 +200,8 @@ git clean -fd samples/practice/tests/
 
 ```plaintext
 #file:practice/src/Practice.Core/Legacy/LegacyReportGenerator.cs
+
+為 LegacyReportGenerator 寫單元測試
 ```
 
 > 驗證 Analyzer 是否識別遺留程式碼的測試性問題（靜態依賴、`DateTime.Now`、直接檔案操作），Writer 是否載入 `private-internal-testing` Skill。
@@ -200,6 +218,8 @@ git clean -fd samples/practice/tests/
 
 ```plaintext
 #file:practice/src/Practice.Core/Services/ReportGenerator.cs
+
+為 ReportGenerator 寫單元測試
 ```
 
 > 驗證 Analyzer 是否識別到重構後的版本使用介面注入（`IUserRepository`、`ITransactionRepository`、`TimeProvider`、`IReportWriter`），Writer 是否正確 Mock 所有依賴。

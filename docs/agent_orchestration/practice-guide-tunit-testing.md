@@ -55,6 +55,8 @@ git clean -fd samples/practice_tunit/tests/
 
 ```plaintext
 #file:practice_tunit/src/Practice.TUnit.Core/Services/BookCatalog.cs
+
+為 BookCatalog 類別寫 TUnit 測試
 ```
 
 > 驗證 Orchestrator 對無依賴純函式類別的 TUnit 測試撰寫能力，確認使用 TUnit 屬性而非 xUnit。
@@ -72,6 +74,8 @@ git clean -fd samples/practice_tunit/tests/
 
 ```plaintext
 #file:practice_tunit/src/Practice.TUnit.Core/Services/LibraryMemberService.cs
+
+為 LibraryMemberService 寫 TUnit 測試
 ```
 
 > 驗證 Writer 能否在 TUnit 框架下正確使用 NSubstitute Mock 依賴，並使用 `[MethodDataSource]` 進行多場景測試。
@@ -89,6 +93,8 @@ git clean -fd samples/practice_tunit/tests/
 
 ```plaintext
 #file:practice_tunit/src/Practice.TUnit.Core/Services/LoanService.cs
+
+為 LoanService 寫 TUnit 測試
 ```
 
 > 驗證 Writer 能否測試複雜的狀態機邏輯（Active → Returned / Renewed / Overdue），並正確使用 `TimeProvider` + `FakeTimeProvider`。
@@ -106,6 +112,8 @@ git clean -fd samples/practice_tunit/tests/
 
 ```plaintext
 #file:practice_tunit/src/Practice.TUnit.Core/Services/ReservationService.cs
+
+為 ReservationService 寫 TUnit 測試
 ```
 
 > 驗證 Writer 對使用 `TimeProvider` 管理預約到期、保留期限等時間敏感邏輯的測試撰寫能力。
@@ -122,6 +130,8 @@ git clean -fd samples/practice_tunit/tests/
 
 ```plaintext
 #file:practice_tunit/src/Practice.TUnit.Core/Services/CatalogExportService.cs
+
+為 CatalogExportService 寫 TUnit 測試
 ```
 
 > 驗證 Writer 能否在 TUnit 框架下正確使用 `MockFileSystem` 測試檔案系統操作。
