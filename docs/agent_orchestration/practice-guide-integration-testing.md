@@ -36,6 +36,27 @@ git clean -fd samples/practice_integration/tests/
 | **.NET SDK**       | .NET 9.0 SDK                               |
 | **Docker Desktop** | 必須執行中（Testcontainers 需要）          |
 
+### 預先拉取 Docker Images
+
+整合測試使用 Testcontainers 啟動資料庫容器，建議在驗證前先拉取所需的 Docker images，避免首次執行時等待下載：
+
+| 容器類型   | Docker Image                                 | 觸發條件                                                                 |
+| ---------- | -------------------------------------------- | ------------------------------------------------------------------------ |
+| SQL Server | `mcr.microsoft.com/mssql/server:2022-latest` | 專案使用 `Microsoft.EntityFrameworkCore.SqlServer` 或 `AddSqlServer<>()` |
+| PostgreSQL | `postgres:latest`                            | 專案使用 `Npgsql.EntityFrameworkCore.PostgreSQL` 或 `AddNpgsql<>()`      |
+| MongoDB    | `mongo:latest`                               | 專案使用 `MongoDB.Driver` 或 `AddMongoDB()`                              |
+| Redis      | `redis:latest`                               | 專案使用 `StackExchange.Redis` 或 `AddRedis()`                           |
+
+> 本驗證專案的情境 1、2 使用 SQL Server，情境 3 使用 MongoDB。PostgreSQL 與 Redis 為 Analyzer 支援的其他容器類型，可依實際專案需求拉取。
+
+```powershell
+# 一次拉取所有需要的 images
+docker pull mcr.microsoft.com/mssql/server:2022-latest
+docker pull postgres:latest
+docker pull mongo:latest
+docker pull redis:latest
+```
+
 ## 操作步驟
 
 1. 在 Copilot Chat 切換到 **Agent** 模式
@@ -102,5 +123,3 @@ git clean -fd samples/practice_integration/tests/
 - **Writer**：是否使用 MongoDB Testcontainer（而非 SQL Server），是否正確替換 MongoDB 連線字串
 - **Executor**：MongoDB 容器啟動是否正常，文件型資料的 CRUD 是否通過
 - **Reviewer**：NoSQL 資料隔離策略是否合理（例如每測試清理 Collection）
-
-

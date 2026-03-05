@@ -9,11 +9,11 @@
 
 本指南以 **.NET 9.0** 為基線版本。三個版本的驗證專案結構完全相同，可自由選擇：
 
-| 版本        | .slnx                        | AppHost 路徑                                        |
-| ----------- | ---------------------------- | --------------------------------------------------- |
-| **.NET 9.0** | `Practice.Aspire.slnx`      | `practice_aspire/src/Practice.Aspire.AppHost/`      |
-| .NET 8.0    | `Practice.Aspire.Net8.slnx` | `practice_aspire/src/Practice.Aspire.Net8.AppHost/` |
-| .NET 10.0   | `Practice.Aspire.Net10.slnx` | `practice_aspire/src/Practice.Aspire.Net10.AppHost/` |
+| 版本         | .slnx                        | AppHost 路徑                                         |
+| ------------ | ---------------------------- | ---------------------------------------------------- |
+| **.NET 9.0** | `Practice.Aspire.slnx`       | `practice_aspire/src/Practice.Aspire.AppHost/`       |
+| .NET 8.0     | `Practice.Aspire.Net8.slnx`  | `practice_aspire/src/Practice.Aspire.Net8.AppHost/`  |
+| .NET 10.0    | `Practice.Aspire.Net10.slnx` | `practice_aspire/src/Practice.Aspire.Net10.AppHost/` |
 
 > 驗證其他版本時，將情境中的檔案路徑替換為對應版本的專案路徑即可。例如：
 > `#file:practice_aspire/src/Practice.Aspire.Net8.AppHost/Program.cs`
@@ -36,6 +36,23 @@ git clean -fd samples/practice_aspire/tests/
 | **.NET SDK**        | .NET 9.0 SDK                                 |
 | **Docker Desktop**  | 必須執行中（Aspire Resource 容器需要）       |
 | **Aspire Workload** | 必須安裝（`dotnet workload install aspire`） |
+
+### 預先拉取 Docker Images
+
+Aspire AppHost 會自動拉取所需的容器映像，但首次啟動時下載耗時較長。建議在驗證前預先拉取，加速測試執行：
+
+| 容器資源                            | Docker Image                                 | 用途              |
+| ----------------------------------- | -------------------------------------------- | ----------------- |
+| SQL Server（`AddSqlServer("sql")`） | `mcr.microsoft.com/mssql/server:2022-latest` | BookingsDb 資料庫 |
+| Redis（`AddRedis("cache")`）        | `redis:latest`                               | 快取服務          |
+
+```powershell
+# 一次拉取所有需要的 images
+docker pull mcr.microsoft.com/mssql/server:2022-latest
+docker pull redis:latest
+```
+
+> Aspire 實際使用的映像版本可能因 Aspire SDK 版本而異，上述為常見預設映像。若 Aspire 啟動時自動拉取了不同版本，屬正常行為。
 
 ## 操作步驟
 
@@ -84,5 +101,3 @@ git clean -fd samples/practice_aspire/tests/
 - **Writer**：產出品質是否與情境 1 一致，是否正確建立 Fixture 共用 App 實例
 - **Executor**：容器啟動順序（先 SQL Server → 再 Redis → 最後 bookingapi）是否正確
 - **Reviewer**：BookingsController 的 CRUD 端點測試覆蓋是否完整
-
-

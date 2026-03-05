@@ -253,5 +253,3 @@ git clean -fd samples/practice/tests/
 - **Writer**：是否針對每個目標動態載入對應的 Skills 組合
 - **Executor**：所有測試是否一次通過
 - **Reviewer**：是否對每個目標分別給出品質評分
-
-
