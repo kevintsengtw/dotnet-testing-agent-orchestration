@@ -242,7 +242,7 @@ git clean -fd samples/practice/tests/
 #file:practice/src/Practice.Core/Validators/OrderValidator.cs
 #file:practice/src/Practice.Core/Legacy/LegacyReportGenerator.cs
 
-幫 TemperatureConverter 和 SubscriptionService 寫測試
+幫以上四個檔案以及 TemperatureConverter 和 SubscriptionService 寫測試
 ```
 
 > 一次涵蓋六個目標（四個 `#file:` + 兩個名稱描述），驗證 Analyzer 與 Writer 是否能同時平行處理多個不同類型的目標（Service / Validator / Legacy）。
