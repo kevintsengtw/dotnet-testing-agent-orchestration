@@ -9,14 +9,14 @@
 
 本指南以 **.NET 9.0** 為基線版本。三個版本的驗證專案結構完全相同，可自由選擇：
 
-| 版本         | .slnx                             | 來源專案路徑                                                  |
-| ------------ | --------------------------------- | ------------------------------------------------------------- |
-| **.NET 9.0** | `Practice.Integration.slnx`       | `practice_integration/src/Practice.Integration.WebApi/`       |
-| .NET 8.0     | `Practice.Integration.Net8.slnx`  | `practice_integration/src/Practice.Integration.WebApi.Net8/`  |
-| .NET 10.0    | `Practice.Integration.Net10.slnx` | `practice_integration/src/Practice.Integration.WebApi.Net10/` |
+| 版本         | .slnx                             | 來源專案路徑                                                          |
+| ------------ | --------------------------------- | --------------------------------------------------------------------- |
+| **.NET 9.0** | `Practice.Integration.slnx`       | `samples/practice_integration/src/Practice.Integration.WebApi/`       |
+| .NET 8.0     | `Practice.Integration.Net8.slnx`  | `samples/practice_integration/src/Practice.Integration.WebApi.Net8/`  |
+| .NET 10.0    | `Practice.Integration.Net10.slnx` | `samples/practice_integration/src/Practice.Integration.WebApi.Net10/` |
 
 > 驗證其他版本時，將情境中的檔案路徑替換為對應版本的專案路徑即可。例如：
-> `#file:practice_integration/src/Practice.Integration.WebApi.Net8/Controllers/OrdersController.cs`
+> `#file:samples/practice_integration/src/Practice.Integration.WebApi.Net8/Controllers/OrdersController.cs`
 
 ### 還原驗證結果
 
@@ -74,7 +74,7 @@ docker pull redis:latest
 ### 情境 1：SQL Server 整合測試（使用 `#file:` 引用）
 
 ```plaintext
-#file:practice_integration/src/Practice.Integration.WebApi/Controllers/OrdersController.cs
+#file:samples/practice_integration/src/Practice.Integration.WebApi/Controllers/OrdersController.cs
 
 測試 OrdersController 的所有 CRUD 端點
 ```
@@ -110,7 +110,7 @@ docker pull redis:latest
 ### 情境 3：MongoDB NoSQL 整合測試
 
 ```plaintext
-#file:practice_integration/src/Practice.Integration.WebApi/Controllers/CustomerActivitiesController.cs
+#file:samples/practice_integration/src/Practice.Integration.WebApi/Controllers/CustomerActivitiesController.cs
 
 測試 CustomerActivitiesController 的所有 API 端點
 ```

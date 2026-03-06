@@ -9,14 +9,14 @@
 
 本指南以 **.NET 9.0** 為基線版本。三個版本的驗證專案結構完全相同，可自由選擇：
 
-| 版本         | .slnx                       | 來源專案路徑                                    |
-| ------------ | --------------------------- | ----------------------------------------------- |
-| **.NET 9.0** | `Practice.TUnit.slnx`       | `practice_tunit/src/Practice.TUnit.Core/`       |
-| .NET 8.0     | `Practice.TUnit.Net8.slnx`  | `practice_tunit/src/Practice.TUnit.Net8.Core/`  |
-| .NET 10.0    | `Practice.TUnit.Net10.slnx` | `practice_tunit/src/Practice.TUnit.Net10.Core/` |
+| 版本         | .slnx                       | 來源專案路徑                                            |
+| ------------ | --------------------------- | ------------------------------------------------------- |
+| **.NET 9.0** | `Practice.TUnit.slnx`       | `samples/practice_tunit/src/Practice.TUnit.Core/`       |
+| .NET 8.0     | `Practice.TUnit.Net8.slnx`  | `samples/practice_tunit/src/Practice.TUnit.Net8.Core/`  |
+| .NET 10.0    | `Practice.TUnit.Net10.slnx` | `samples/practice_tunit/src/Practice.TUnit.Net10.Core/` |
 
 > 驗證其他版本時，將情境中的檔案路徑替換為對應版本的專案路徑即可。例如：
-> `#file:practice_tunit/src/Practice.TUnit.Net8.Core/Services/BookCatalog.cs`
+> `#file:samples/practice_tunit/src/Practice.TUnit.Net8.Core/Services/BookCatalog.cs`
 
 ### 還原驗證結果
 
@@ -54,7 +54,7 @@ git clean -fd samples/practice_tunit/tests/
 ### 情境 1：純函式 TUnit 測試
 
 ```plaintext
-#file:practice_tunit/src/Practice.TUnit.Core/Services/BookCatalog.cs
+#file:samples/practice_tunit/src/Practice.TUnit.Core/Services/BookCatalog.cs
 
 為 BookCatalog 類別寫 TUnit 測試
 ```
@@ -73,7 +73,7 @@ git clean -fd samples/practice_tunit/tests/
 ### 情境 2：Mock 依賴 + 複雜驗證邏輯
 
 ```plaintext
-#file:practice_tunit/src/Practice.TUnit.Core/Services/LibraryMemberService.cs
+#file:samples/practice_tunit/src/Practice.TUnit.Core/Services/LibraryMemberService.cs
 
 為 LibraryMemberService 寫 TUnit 測試
 ```
@@ -92,7 +92,7 @@ git clean -fd samples/practice_tunit/tests/
 ### 情境 3：狀態轉換邏輯測試
 
 ```plaintext
-#file:practice_tunit/src/Practice.TUnit.Core/Services/LoanService.cs
+#file:samples/practice_tunit/src/Practice.TUnit.Core/Services/LoanService.cs
 
 為 LoanService 寫 TUnit 測試
 ```
@@ -111,7 +111,7 @@ git clean -fd samples/practice_tunit/tests/
 ### 情境 4：TimeProvider 時間敏感邏輯
 
 ```plaintext
-#file:practice_tunit/src/Practice.TUnit.Core/Services/ReservationService.cs
+#file:samples/practice_tunit/src/Practice.TUnit.Core/Services/ReservationService.cs
 
 為 ReservationService 寫 TUnit 測試
 ```
@@ -129,7 +129,7 @@ git clean -fd samples/practice_tunit/tests/
 ### 情境 5：IFileSystem 依賴測試
 
 ```plaintext
-#file:practice_tunit/src/Practice.TUnit.Core/Services/CatalogExportService.cs
+#file:samples/practice_tunit/src/Practice.TUnit.Core/Services/CatalogExportService.cs
 
 為 CatalogExportService 寫 TUnit 測試
 ```
@@ -164,7 +164,7 @@ git clean -fd samples/practice_tunit/tests/
 ### 情境 7：xUnit → TUnit 遷移
 
 ```plaintext
-#file:practice_tunit/migration_source/BookCatalogXunitTests.cs
+#file:samples/practice_tunit/migration_source/BookCatalogXunitTests.cs
 
 將這個 xUnit 測試遷移到 TUnit
 ```

@@ -9,14 +9,14 @@
 
 本指南以 **.NET 9.0** 為基線版本。三個版本的驗證專案結構完全相同，可自由選擇：
 
-| 版本         | .slnx                        | AppHost 路徑                                         |
-| ------------ | ---------------------------- | ---------------------------------------------------- |
-| **.NET 9.0** | `Practice.Aspire.slnx`       | `practice_aspire/src/Practice.Aspire.AppHost/`       |
-| .NET 8.0     | `Practice.Aspire.Net8.slnx`  | `practice_aspire/src/Practice.Aspire.Net8.AppHost/`  |
-| .NET 10.0    | `Practice.Aspire.Net10.slnx` | `practice_aspire/src/Practice.Aspire.Net10.AppHost/` |
+| 版本         | .slnx                        | AppHost 路徑                                                 |
+| ------------ | ---------------------------- | ------------------------------------------------------------ |
+| **.NET 9.0** | `Practice.Aspire.slnx`       | `samples/practice_aspire/src/Practice.Aspire.AppHost/`       |
+| .NET 8.0     | `Practice.Aspire.Net8.slnx`  | `samples/practice_aspire/src/Practice.Aspire.Net8.AppHost/`  |
+| .NET 10.0    | `Practice.Aspire.Net10.slnx` | `samples/practice_aspire/src/Practice.Aspire.Net10.AppHost/` |
 
 > 驗證其他版本時，將情境中的檔案路徑替換為對應版本的專案路徑即可。例如：
-> `#file:practice_aspire/src/Practice.Aspire.Net8.AppHost/Program.cs`
+> `#file:samples/practice_aspire/src/Practice.Aspire.Net8.AppHost/Program.cs`
 
 ### 還原驗證結果
 
@@ -71,7 +71,7 @@ docker pull redis:latest
 ### 情境 1：Aspire 整合測試（使用 `#file:` 引用）
 
 ```plaintext
-#file:practice_aspire/src/Practice.Aspire.AppHost/Program.cs
+#file:samples/practice_aspire/src/Practice.Aspire.AppHost/Program.cs
 
 測試 bookingapi 服務的所有 API 端點
 ```

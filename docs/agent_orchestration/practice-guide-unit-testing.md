@@ -9,14 +9,14 @@
 
 本指南以 **.NET 9.0** 為基線版本。三個版本的驗證專案結構完全相同，可自由選擇：
 
-| 版本         | .slnx                         | 來源專案路徑                        |
-| ------------ | ----------------------------- | ----------------------------------- |
-| **.NET 9.0** | `Practice.Samples.slnx`       | `practice/src/Practice.Core/`       |
-| .NET 8.0     | `Practice.Samples.Net8.slnx`  | `practice/src/Practice.Core.Net8/`  |
-| .NET 10.0    | `Practice.Samples.Net10.slnx` | `practice/src/Practice.Core.Net10/` |
+| 版本         | .slnx                         | 來源專案路徑                                |
+| ------------ | ----------------------------- | ------------------------------------------- |
+| **.NET 9.0** | `Practice.Samples.slnx`       | `samples/practice/src/Practice.Core/`       |
+| .NET 8.0     | `Practice.Samples.Net8.slnx`  | `samples/practice/src/Practice.Core.Net8/`  |
+| .NET 10.0    | `Practice.Samples.Net10.slnx` | `samples/practice/src/Practice.Core.Net10/` |
 
 > 驗證其他版本時，將情境中的檔案路徑替換為對應版本的專案路徑即可。例如：
-> `#file:practice/src/Practice.Core.Net8/Services/WeatherAlertService.cs`
+> `#file:samples/practice/src/Practice.Core.Net8/Services/WeatherAlertService.cs`
 
 ### 還原驗證結果
 
@@ -54,7 +54,7 @@ git clean -fd samples/practice/tests/
 ### 情境 1：基礎純函式測試
 
 ```plaintext
-#file:practice/src/Practice.Core/TemperatureConverter.cs
+#file:samples/practice/src/Practice.Core/TemperatureConverter.cs
 
 為 TemperatureConverter 類別寫單元測試
 ```
@@ -73,7 +73,7 @@ git clean -fd samples/practice/tests/
 ### 情境 2：Mock 依賴的服務測試
 
 ```plaintext
-#file:practice/src/Practice.Core/Services/WeatherAlertService.cs
+#file:samples/practice/src/Practice.Core/Services/WeatherAlertService.cs
 
 為 WeatherAlertService 寫單元測試
 ```
@@ -91,7 +91,7 @@ git clean -fd samples/practice/tests/
 ### 情境 3：AutoFixture 搭配 Bogus 測試資料
 
 ```plaintext
-#file:practice/src/Practice.Core/Services/EmployeeService.cs
+#file:samples/practice/src/Practice.Core/Services/EmployeeService.cs
 
 為 EmployeeService 寫單元測試
 ```
@@ -109,7 +109,7 @@ git clean -fd samples/practice/tests/
 ### 情境 4：TimeProvider 時間依賴測試
 
 ```plaintext
-#file:practice/src/Practice.Core/Services/SubscriptionService.cs
+#file:samples/practice/src/Practice.Core/Services/SubscriptionService.cs
 
 為 SubscriptionService 寫單元測試
 ```
@@ -127,7 +127,7 @@ git clean -fd samples/practice/tests/
 ### 情境 5：FileSystem 抽象化測試
 
 ```plaintext
-#file:practice/src/Practice.Core/Services/ConfigurationLoader.cs
+#file:samples/practice/src/Practice.Core/Services/ConfigurationLoader.cs
 
 為 ConfigurationLoader 寫單元測試
 ```
@@ -145,7 +145,7 @@ git clean -fd samples/practice/tests/
 ### 情境 6：FluentValidation 驗證器測試
 
 ```plaintext
-#file:practice/src/Practice.Core/Validators/OrderValidator.cs
+#file:samples/practice/src/Practice.Core/Validators/OrderValidator.cs
 
 為 OrderValidator 寫單元測試
 ```
@@ -163,7 +163,7 @@ git clean -fd samples/practice/tests/
 ### 情境 7：FluentValidation 驗證器測試（第二個目標）
 
 ```plaintext
-#file:practice/src/Practice.Core/Validators/EmployeeValidator.cs
+#file:samples/practice/src/Practice.Core/Validators/EmployeeValidator.cs
 
 為 EmployeeValidator 寫單元測試
 ```
@@ -181,7 +181,7 @@ git clean -fd samples/practice/tests/
 ### 情境 8：跨技能整合（多依賴 + 時間 + 資料）
 
 ```plaintext
-#file:practice/src/Practice.Core/Services/OrderProcessingService.cs
+#file:samples/practice/src/Practice.Core/Services/OrderProcessingService.cs
 
 為 OrderProcessingService 寫單元測試
 ```
@@ -199,7 +199,7 @@ git clean -fd samples/practice/tests/
 ### 情境 9：遺留程式碼識別
 
 ```plaintext
-#file:practice/src/Practice.Core/Legacy/LegacyReportGenerator.cs
+#file:samples/practice/src/Practice.Core/Legacy/LegacyReportGenerator.cs
 
 為 LegacyReportGenerator 寫單元測試
 ```
@@ -217,7 +217,7 @@ git clean -fd samples/practice/tests/
 ### 情境 10：重構後的可測試服務
 
 ```plaintext
-#file:practice/src/Practice.Core/Services/ReportGenerator.cs
+#file:samples/practice/src/Practice.Core/Services/ReportGenerator.cs
 
 為 ReportGenerator 寫單元測試
 ```
@@ -237,10 +237,10 @@ git clean -fd samples/practice/tests/
 以下為 **單次對話** 的完整輸入內容：
 
 ```plaintext
-#file:practice/src/Practice.Core/Services/EmployeeService.cs
-#file:practice/src/Practice.Core/Validators/EmployeeValidator.cs
-#file:practice/src/Practice.Core/Validators/OrderValidator.cs
-#file:practice/src/Practice.Core/Legacy/LegacyReportGenerator.cs
+#file:samples/practice/src/Practice.Core/Services/EmployeeService.cs
+#file:samples/practice/src/Practice.Core/Validators/EmployeeValidator.cs
+#file:samples/practice/src/Practice.Core/Validators/OrderValidator.cs
+#file:samples/practice/src/Practice.Core/Legacy/LegacyReportGenerator.cs
 
 幫以上四個檔案以及 TemperatureConverter 和 SubscriptionService 寫測試
 ```
