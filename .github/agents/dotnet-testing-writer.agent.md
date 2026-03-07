@@ -2,7 +2,7 @@
 name: dotnet-testing-writer
 description: '根據分析結果載入對應的 Agent Skills，撰寫符合最佳實踐的 .NET 單元測試'
 user-invokable: false
-tools: ['read', 'search', 'edit', 'execute/getTerminalOutput','execute/runInTerminal','read/terminalLastCommand','read/terminalSelection']
+tools: ['read', 'search', 'create', 'edit', 'execute/getTerminalOutput','execute/runInTerminal','read/terminalLastCommand','read/terminalSelection']
 model: ['Claude Sonnet 4.6 (copilot)', 'GPT-5.1-Codex-Max (copilot)']
 ---
 

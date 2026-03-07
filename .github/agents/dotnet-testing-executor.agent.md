@@ -2,7 +2,7 @@
 name: dotnet-testing-executor
 description: '建置與執行 .NET 單元測試，處理編譯錯誤與測試失敗的修正迴圈'
 user-invokable: false
-tools: ['read', 'search', 'edit', 'execute/getTerminalOutput', 'execute/runInTerminal', 'read/terminalLastCommand', 'read/terminalSelection', 'execute/createAndRunTask']
+tools: ['read', 'search', 'create', 'edit', 'execute/getTerminalOutput', 'execute/runInTerminal', 'read/terminalLastCommand', 'read/terminalSelection', 'execute/createAndRunTask']
 model: Claude Sonnet 4.6 (copilot)
 ---
 

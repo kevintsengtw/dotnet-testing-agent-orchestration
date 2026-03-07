@@ -2,7 +2,7 @@
 name: dotnet-testing-advanced-tunit-writer
 description: '根據 Analyzer 分析結果載入 TUnit Skills，撰寫符合最佳實踐的 TUnit 測試'
 user-invokable: false
-tools: ['read', 'search', 'edit', 'execute/getTerminalOutput','execute/runInTerminal','read/terminalLastCommand','read/terminalSelection']
+tools: ['read', 'search', 'create', 'edit', 'execute/getTerminalOutput','execute/runInTerminal','read/terminalLastCommand','read/terminalSelection']
 model: ['Claude Sonnet 4.6 (copilot)', 'GPT-5.1-Codex-Max (copilot)']
 ---
 
