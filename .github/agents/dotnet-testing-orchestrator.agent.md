@@ -123,6 +123,24 @@ model: ['Claude Sonnet 4.6 (copilot)', 'Claude Opus 4.6 (copilot)']
 
 ---
 
+## 執行進度顯示規範
+
+**每次委派 subagent 之前，你必須先向使用者輸出明顯的階段標題**，讓使用者清楚掌握執行進度。收到回傳後，輸出 1-2 句過渡摘要再進入下一階段。
+
+### 各階段必要輸出
+
+| 動作時機 | 必輸出文字 |
+|---------|----------|
+| 委派 Analyzer **前** | `## 階段 1：委派分析（Analyzer）` |
+| Analyzer 回傳後 | `Analyzer 分析完成！識別出 N 個方法、Y 個依賴，需要 [技術清單]。現在委派 Writer 撰寫測試。` |
+| 委派 Writer **前** | `## 階段 2：委派撰寫（Test Writer）` |
+| Writer 回傳後 | `Writer 完成！已建立測試檔案，共 N 個測試案例。現在委派 Executor 建置與執行。` |
+| 委派 Executor **前** | `## 階段 3：委派執行（Test Executor）` |
+| Executor 回傳後 | `全數通過！N 個測試案例通過，修正 Y 次。現在委派 Reviewer 進行品質審查。` |
+| 委派 Reviewer **前** | `## 階段 4：委派審查（Test Reviewer）` |
+
+---
+
 ## 結果整合與呈現
 
 收到四個 subagent 的回傳結果後，你必須整合呈現給使用者：
