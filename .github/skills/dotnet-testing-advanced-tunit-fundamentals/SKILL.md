@@ -2,31 +2,11 @@
 name: dotnet-testing-advanced-tunit-fundamentals
 description: |
   TUnit 新世代測試框架入門完整指南。當需要使用 TUnit 建立測試專案或從 xUnit 遷移至 TUnit 時使用。涵蓋 Source Generator 驅動測試發現、AOT 編譯支援、流暢式非同步斷言。包含專案建立、[Test] 屬性、生命週期管理、並行控制與 xUnit 語法對照。
+  Make sure to use this skill whenever the user mentions TUnit, Source Generator testing, AOT test framework, TUnit vs xUnit, or migrating to TUnit, even if they don't explicitly ask for TUnit fundamentals.
   Keywords: TUnit, tunit testing, source generator testing, AOT testing, 新世代測試框架, [Test], [Arguments], TUnit.Assertions, Assert.That, Before(Test), After(Test), NotInParallel, TUnit.Templates, Microsoft.Testing.Platform, TUnit vs xUnit, 並行執行
-license: MIT
-metadata:
-  author: Kevin Tseng
-  version: "1.0.0"
-  tags: "tunit, testing-framework, source-generator, aot, modern-testing, performance"
-  related_skills: "advanced-tunit-advanced, xunit-project-setup, unit-test-fundamentals"
 ---
 
 # TUnit 新世代測試框架入門基礎
-
-## 適用情境
-
-本技能涵蓋 TUnit 新世代 .NET 測試框架的入門基礎，從框架特色到實際專案建立與測試撰寫。
-
-**核心主題：**
-
-- TUnit 框架特色與設計理念
-- Source Generator 驅動的測試發現
-- AOT (Ahead-of-Time) 編譯支援
-- 流暢式非同步斷言系統
-- 專案建立與套件配置
-- 與 xUnit 的語法差異比較
-
----
 
 ## TUnit 框架核心特色
 
@@ -274,7 +254,7 @@ await Assert.That(email).Contains("@").And.EndsWith(".com");
 await Assert.That(() => action()).Throws<InvalidOperationException>();
 ```
 
-> 📖 完整斷言類型與範例請參閱 [TUnit 斷言系統詳細說明](references/tunit-assertions-detail.md)
+> 完整斷言類型與範例請參閱 [TUnit 斷言系統詳細說明](references/tunit-assertions-detail.md)
 
 ---
 
@@ -286,7 +266,7 @@ TUnit 支援建構式 / `Dispose` 模式，以及 `[Before(Test)]`、`[Before(Cl
 執行順序：Before(Class) → 建構式 → Before(Test) → 測試方法 → After(Test) → Dispose → After(Class)
 ```
 
-> 📖 完整生命週期範例與屬性對照表請參閱 [生命週期管理詳細說明](references/lifecycle-management.md)
+> 完整生命週期範例與屬性對照表請參閱 [生命週期管理詳細說明](references/lifecycle-management.md)
 
 ---
 
@@ -475,6 +455,13 @@ dotnet publish -c Release -p:PublishAot=true
 
 ---
 
+## 輸出格式
+
+- 產生 TUnit 測試類別（含 [Test]、[Arguments] 屬性）
+- 產生 .csproj 設定（TUnit 套件參考）
+- 提供 GlobalUsings.cs 設定
+- 包含 xUnit 到 TUnit 的遷移程式碼對照
+
 ## 參考資源
 
 ### 原始文章
@@ -495,3 +482,9 @@ dotnet publish -c Release -p:PublishAot=true
 
 - [Microsoft.Testing.Platform 介紹](https://learn.microsoft.com/dotnet/core/testing/microsoft-testing-platform-intro)
 - [原生 AOT 部署](https://learn.microsoft.com/zh-tw/dotnet/core/deploying/native-aot)
+
+### 相關技能
+
+- `dotnet-testing-advanced-tunit-advanced` - TUnit 進階功能
+- `dotnet-testing-advanced-xunit-upgrade-guide` - xUnit 升級指南
+- `dotnet-testing-xunit-project-setup` - xUnit 專案設定（比較用）

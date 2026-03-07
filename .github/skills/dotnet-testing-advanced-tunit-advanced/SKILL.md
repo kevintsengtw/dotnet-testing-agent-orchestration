@@ -2,39 +2,17 @@
 name: dotnet-testing-advanced-tunit-advanced
 description: |
   TUnit 進階應用完整指南。當需要使用 TUnit 進行資料驅動測試、依賴注入或整合測試時使用。涵蓋 MethodDataSource、ClassDataSource、Matrix Tests、Properties 過濾。包含 Retry/Timeout 控制、WebApplicationFactory 整合、Testcontainers 多服務編排。
+  Make sure to use this skill whenever the user mentions TUnit advanced, MethodDataSource, ClassDataSource, Matrix Tests, TUnit dependency injection, TUnit Retry/Timeout, or TUnit WebApplicationFactory, even if they don't explicitly ask for TUnit advanced features.
   Keywords: TUnit advanced, TUnit 進階, MethodDataSource, ClassDataSource, Matrix Tests, MatrixDataSource, MicrosoftDependencyInjectionDataSource, Property, Retry, Timeout, 資料驅動測試, 測試過濾, WebApplicationFactory TUnit, 多容器編排
-license: MIT
-metadata:
-  author: Kevin Tseng
-  version: "1.0.0"
-  tags: "tunit, advanced-testing, data-driven, dependency-injection, integration-testing, testcontainers"
-  related_skills: "advanced-tunit-fundamentals, advanced-webapi-integration-testing"
 ---
 
 # TUnit 進階應用：資料驅動測試、依賴注入與整合測試實戰
-
-## 適用情境
-
-本技能涵蓋 TUnit 進階應用技巧，從資料驅動測試到依賴注入，從執行控制到 ASP.NET Core 整合測試實戰。
-
-**核心主題：**
-
-- 資料驅動測試進階技巧 (MethodDataSource、ClassDataSource、Matrix Tests)
-- Properties 屬性標記與測試過濾
-- 測試生命週期與依賴注入
-- 執行控制 (Retry、Timeout、DisplayName)
-- ASP.NET Core 整合測試 (WebApplicationFactory)
-- 效能測試與負載測試
-- TUnit + Testcontainers 複雜基礎設施編排
-- TUnit Engine Modes 與疑難排解
-
----
 
 ## 資料驅動測試進階技巧
 
 TUnit 提供 MethodDataSource、ClassDataSource、Matrix Tests 三種進階資料來源。MethodDataSource 最靈活，支援動態產生與外部檔案載入；ClassDataSource 適合跨測試類別共享資料與 AutoFixture 整合；Matrix Tests 自動產生所有參數組合（注意控制數量避免爆炸性增長）。
 
-> 📖 完整範例與比較表請參閱 [references/data-driven-testing.md](references/data-driven-testing.md)
+> 完整範例與比較表請參閱 [references/data-driven-testing.md](references/data-driven-testing.md)
 
 ---
 
@@ -78,13 +56,13 @@ public static class TestProperties
     public const string CATEGORY_UNIT = "Unit";
     public const string CATEGORY_INTEGRATION = "Integration";
     public const string CATEGORY_E2E = "E2E";
-    
+
     // 優先級
     public const string PRIORITY_CRITICAL = "Critical";
     public const string PRIORITY_HIGH = "High";
     public const string PRIORITY_MEDIUM = "Medium";
     public const string PRIORITY_LOW = "Low";
-    
+
     // 環境
     public const string ENV_DEVELOPMENT = "Development";
     public const string ENV_STAGING = "Staging";
@@ -132,7 +110,7 @@ dotnet run --treenode-filter "/*/*/*/*[Feature=OrderProcessing]"
 
 TUnit 提供完整的生命週期鉤子：`[Before(Class)]` → 建構式 → `[Before(Test)]` → 測試方法 → `[After(Test)]` → Dispose → `[After(Class)]`。另有 Assembly/TestSession 層級與 `[BeforeEvery]`/`[AfterEvery]` 全域鉤子。建構式永遠最先執行，BeforeClass/AfterClass 各只執行一次。
 
-> 📖 完整屬性家族與範例請參閱 [references/lifecycle-management.md](references/lifecycle-management.md)
+> 完整屬性家族與範例請參閱 [references/lifecycle-management.md](references/lifecycle-management.md)
 
 ---
 
@@ -222,7 +200,7 @@ public class DependencyInjectionTests(OrderService orderService)
 - **`[Timeout(ms)]`**：為效能敏感測試設定合理上限，搭配 `Stopwatch` 驗證 SLA
 - **`[DisplayName]`**：支援 `{0}` 參數插值，讓測試報告更貼近業務語言
 
-> 📖 完整範例（Retry/Timeout/DisplayName）請參閱 [references/execution-control.md](references/execution-control.md)
+> 完整範例（Retry/Timeout/DisplayName）請參閱 [references/execution-control.md](references/execution-control.md)
 
 ---
 
@@ -230,7 +208,7 @@ public class DependencyInjectionTests(OrderService orderService)
 
 在 TUnit 中使用 `WebApplicationFactory<Program>` 進行 ASP.NET Core 整合測試，透過實作 `IDisposable` 管理生命週期。涵蓋 API 回應驗證、Content-Type 標頭檢查，以及效能基準與並行負載測試。
 
-> 📖 完整 WebApplicationFactory 整合與負載測試範例請參閱 [references/aspnet-integration.md](references/aspnet-integration.md)
+> 完整 WebApplicationFactory 整合與負載測試範例請參閱 [references/aspnet-integration.md](references/aspnet-integration.md)
 
 ---
 
@@ -238,7 +216,7 @@ public class DependencyInjectionTests(OrderService orderService)
 
 使用 `[Before(Assembly)]` / `[After(Assembly)]` 在 Assembly 層級管理 PostgreSQL、Redis、Kafka 等多容器編排，搭配 `NetworkBuilder` 建立共用網路。容器僅啟動一次，大幅減少啟動時間與資源消耗，同時保持測試間的資料隔離。
 
-> 📖 完整多容器編排與全域共享範例請參閱 [references/tunit-testcontainers.md](references/tunit-testcontainers.md)
+> 完整多容器編排與全域共享範例請參閱 [references/tunit-testcontainers.md](references/tunit-testcontainers.md)
 
 ---
 
@@ -398,6 +376,13 @@ tunit.enable_verbose_diagnostics = true
 
 ---
 
+## 輸出格式
+
+- 產生使用 MethodDataSource/ClassDataSource/Matrix Tests 的資料驅動測試類別（.cs 檔案）
+- 包含 MicrosoftDependencyInjectionDataSource 依賴注入設定
+- 包含 Retry/Timeout/DisplayName 執行控制範例
+- 產生 WebApplicationFactory 整合測試與 Testcontainers 多容器編排程式碼
+
 ## 參考資源
 
 ### 原始文章
@@ -434,3 +419,9 @@ tunit.enable_verbose_diagnostics = true
 
 - [Testcontainers.NET 官方網站](https://dotnet.testcontainers.org/)
 - [Testcontainers.NET GitHub](https://github.com/testcontainers/testcontainers-dotnet)
+
+### 相關技能
+
+- `dotnet-testing-advanced-tunit-fundamentals` - TUnit 基礎（前置技能）
+- `dotnet-testing-advanced-aspnet-integration-testing` - ASP.NET Core 整合測試
+- `dotnet-testing-advanced-testcontainers-database` - Testcontainers 資料庫測試

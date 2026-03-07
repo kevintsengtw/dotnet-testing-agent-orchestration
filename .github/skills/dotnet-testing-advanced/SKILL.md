@@ -2,44 +2,19 @@
 name: dotnet-testing-advanced
 description: |
   .NET 進階測試技能總覽與引導中心。當使用者詢問「整合測試」、「API 測試」、「容器化測試」、「微服務測試」、「測試框架遷移」、「Testcontainers」、「Aspire 測試」等進階測試需求時觸發。會根據具體需求推薦適合的子技能組合，涵蓋整合測試、Testcontainers、Aspire 測試、框架升級等 8 個進階技能。
+  Make sure to use this skill whenever the user mentions integration testing, API testing, Testcontainers, .NET Aspire testing, WebApplicationFactory, or xUnit/TUnit migration, even if they don't explicitly ask for advanced testing guidance.
   Keywords: integration testing, 整合測試, API testing, advanced testing, 進階測試, testcontainers, aspire testing, WebApplicationFactory, TestServer, database test, 資料庫測試, EF Core test, MongoDB test, Redis test, Docker test, 容器測試, microservice test, 微服務測試, .NET Aspire, xUnit upgrade, TUnit, framework migration
-license: MIT
-metadata:
-  author: Kevin Tseng
-  version: "1.0.0"
-  tags: ".NET, testing, integration, advanced, testcontainers, aspire"
-  related_skills: "dotnet-testing"
-  skill_count: 8
-  skill_type: "overview"
 ---
 
 # .NET 進階測試技能總覽
 
----
+本檔案是「進階測試導航中心」，幫助找到正確的進階子技能。進階測試涉及容器管理、WebApplicationFactory 設定等複雜細節，子技能包含完整的設定指引和常見問題排解，載入正確的子技能能確保使用者獲得完整指引。
 
-## 🤖 AI Agent 重要提示
-
-**當您（AI Agent）被載入此進階入口 skill 時，請先閱讀以下指引**：
-
-### 📋 本技能的定位
-
-本檔案是「進階測試導航中心」，用於幫助找到正確的**進階子技能**。
-
-#### 您的任務是
-
-1. ✅ 根據使用者需求匹配對應的進階子技能
-2. ✅ 使用 `Skill` tool 載入具體的子技能
-3. ✅ 讓子技能提供專業的整合測試指引
-
-#### 禁止行為
-
-- ❌ 不要在本入口 skill 中直接提供整合測試程式碼
-- ❌ 不要在沒有載入子技能的情況下開始實作測試
-- ❌ 不要跳過子技能直接提供「一般性」整合測試建議
+根據使用者需求匹配對應的進階子技能，使用 Skill tool 載入，讓子技能提供專業的整合測試指引。
 
 ---
 
-## 🎯 快速技能對照表（AI Agent 必讀）
+## 快速技能對照表
 
 **使用者提到的關鍵字 → 應載入的進階子技能**
 
@@ -77,9 +52,7 @@ metadata:
 
 ---
 
-## ⚠️ 使用流程範例
-
-### ✅ 正確流程
+## 使用流程範例
 
 ```
 使用者：請幫我建立 ProductsController 的 API 整合測試
@@ -92,17 +65,9 @@ AI：我注意到您需要進行 API 整合測試。根據快速對照表，
 AI：現在按照 ASP.NET Core Integration Testing skill 的指引為您建立測試...
 ```
 
-### ❌ 錯誤流程
-
-```
-使用者：請幫我建立 ProductsController 的 API 整合測試
-
-AI：好的，我來寫整合測試...（直接開始寫程式碼，沒有載入子技能）
-```
-
 ---
 
-## 📚 完整技能清單
+## 完整技能清單
 
 如需查看完整的 8 個進階技能清單、詳細決策樹、學習路徑建議，請繼續閱讀本檔案後續內容。
 
@@ -110,23 +75,11 @@ AI：好的，我來寫整合測試...（直接開始寫程式碼，沒有載入
 
 ---
 
-## 適用情境
-
-當您需要以下進階測試能力時，我會協助您找到正確的技能：
-
-- 測試完整的 Web API 端點與 HTTP 流程
-- 在測試中使用真實的資料庫（容器化）
-- 測試 NoSQL 資料庫（MongoDB、Redis 等）
-- 測試微服務架構與分散式系統
-- 升級測試框架版本（xUnit 2.x → 3.x）
-- 遷移到新測試框架（TUnit）
-- 建立端到端的整合測試
-
 ## 快速決策樹
 
 根據測試情境（API 測試、真實資料庫、微服務、框架遷移）快速找到對應的進階子技能。涵蓋 4 大情境與多個選項分支。
 
-> 📖 詳細內容請參閱 [references/decision-tree.md](references/decision-tree.md)
+> 詳細內容請參閱 [references/decision-tree.md](references/decision-tree.md)
 
 ---
 
@@ -134,7 +87,7 @@ AI：好的，我來寫整合測試...（直接開始寫程式碼，沒有載入
 
 8 個進階技能分為三大類：整合測試（4 個）、微服務測試（1 個）、框架遷移（3 個），包含各技能的核心價值、適合情境、學習難度與前置技能。
 
-> 📖 詳細內容請參閱 [references/skill-classification-map.md](references/skill-classification-map.md)
+> 詳細內容請參閱 [references/skill-classification-map.md](references/skill-classification-map.md)
 
 ---
 
@@ -142,7 +95,7 @@ AI：好的，我來寫整合測試...（直接開始寫程式碼，沒有載入
 
 7 個常見任務的完整映射，包含情境描述、推薦技能、實施步驟、提示詞範例與預期程式碼結構。
 
-> 📖 詳細內容請參閱 [references/task-mapping-table.md](references/task-mapping-table.md)
+> 詳細內容請參閱 [references/task-mapping-table.md](references/task-mapping-table.md)
 
 ---
 
@@ -224,7 +177,7 @@ AI：好的，我來寫整合測試...（直接開始寫程式碼，沒有載入
 
 包含整合測試入門（1 週）、微服務測試專精（3-5 天）、框架遷移路徑等完整學習計畫與每日學習重點。
 
-> 📖 詳細內容請參閱 [references/learning-paths.md](references/learning-paths.md)
+> 詳細內容請參閱 [references/learning-paths.md](references/learning-paths.md)
 
 ---
 
@@ -352,7 +305,7 @@ AI：好的，我來寫整合測試...（直接開始寫程式碼，沒有載入
 
 4 個完整的對話範例，展示 AI 如何引導選擇正確技能：API 測試、微服務測試、框架升級、TUnit 評估。
 
-> 📖 詳細內容請參閱 [references/conversation-examples.md](references/conversation-examples.md)
+> 詳細內容請參閱 [references/conversation-examples.md](references/conversation-examples.md)
 
 ---
 
@@ -379,12 +332,18 @@ AI：好的，我來寫整合測試...（直接開始寫程式碼，沒有載入
 
 ---
 
+## 輸出格式
+
+- 根據使用者需求推薦具體的進階子技能名稱與載入指令
+- 提供簡短的推薦理由說明為何選擇該技能
+- 若涉及多個技能組合，列出建議的學習順序
+
 ## 相關資源
 
 ### 原始資料來源
 
 - **iThome 鐵人賽系列文章**：[老派軟體工程師的測試修練 - 30 天挑戰](https://ithelp.ithome.com.tw/users/20066083/ironman/8276)
-  🏆 2025 iThome 鐵人賽 Software Development 組冠軍
+  2025 iThome 鐵人賽 Software Development 組冠軍
 
 - **完整範例程式碼**：[30Days_in_Testing_Samples](https://github.com/kevintsengtw/30Days_in_Testing_Samples)
   包含所有範例專案的可執行程式碼

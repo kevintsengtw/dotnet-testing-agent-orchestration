@@ -2,40 +2,11 @@
 name: dotnet-testing-datetime-testing-timeprovider
 description: |
   使用 TimeProvider 測試時間相依邏輯的專門技能。當需要測試 DateTime、控制時間流逝、處理時區轉換、測試過期邏輯時使用。涵蓋 TimeProvider 抽象化、FakeTimeProvider 時間控制、時間凍結與快轉等。
+  Make sure to use this skill whenever the user mentions DateTime testing, TimeProvider, FakeTimeProvider, time-dependent logic, cache expiration, or token expiration testing, even if they don't explicitly ask for time testing guidance.
   Keywords: datetime, time testing, 時間測試, TimeProvider, FakeTimeProvider, DateTime.Now, 時間相依, 快取過期, token 過期, Microsoft.Bcl.TimeProvider, GetUtcNow, SetUtcNow, Advance, time freeze, 時間凍結, 時間快轉
-license: MIT
-metadata:
-  author: Kevin Tseng
-  version: "1.0.0"
-  tags: ".NET, testing, TimeProvider, DateTime, time testing"
-  related_skills: "unit-test-fundamentals, nsubstitute-mocking, filesystem-testing-abstractions"
 ---
 
 # DateTime 與時間相依性測試指南
-
-## 適用情境
-
-本技能指導如何使用 Microsoft.Bcl.TimeProvider 解決時間相依程式碼的測試問題。透過時間抽象化，讓「現在時間」變得可控制、可預測、可重現。
-
-### 適用場景
-
-- **營業時間判斷**：系統根據當前時間決定是否允許操作
-- **優惠活動控制**：特定日期或時段才生效的促銷邏輯
-- **快取過期機制**：依據時間決定資料是否有效
-- **排程任務觸發**：定時執行的背景作業
-- **Token 有效期限**：驗證時間敏感的安全機制
-
-### 必要套件
-
-```xml
-<!-- 正式程式碼 -->
-<PackageReference Include="Microsoft.Bcl.TimeProvider" Version="9.0.0" />
-
-<!-- 測試專案 -->
-<PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" Version="9.0.0" />
-```
-
----
 
 ## 核心原則
 
@@ -336,27 +307,34 @@ public void GetTimeBasedDiscount_週五_應回傳九折優惠(
 
 ## 最佳實踐檢查清單
 
-### ✅ 程式碼設計
+### 程式碼設計
 
 - [ ] 所有時間相依類別透過建構式接收 `TimeProvider`
 - [ ] 使用 `_timeProvider.GetLocalNow()` 取代 `DateTime.Now`
 - [ ] 使用 `_timeProvider.GetUtcNow()` 取代 `DateTime.UtcNow`
 - [ ] DI 容器註冊 `TimeProvider.System` 作為生產環境實作
 
-### ✅ 測試設計
+### 測試設計
 
 - [ ] 每個測試方法使用獨立的 `FakeTimeProvider` 實例
 - [ ] 使用 `SetLocalNow()` 擴充方法簡化時間設定
 - [ ] 使用 `Advance()` 測試時間敏感邏輯（快取、過期、延遲）
 - [ ] 測試涵蓋邊界條件（開始時間、結束時間、臨界點）
 
-### ✅ 進階考量
+### 進階考量
 
 - [ ] FakeTimeProvider 是執行緒安全的，可用於並行測試
 - [ ] 使用 `IDisposable` 模式正確釋放 FakeTimeProvider
 - [ ] 時區測試使用 `SetLocalTimeZone()` 明確設定時區
 
 ---
+
+## 輸出格式
+
+- 產生使用 TimeProvider 抽象的服務類別
+- 產生使用 FakeTimeProvider 的測試類別
+- 包含時間凍結、快轉、時區轉換測試範例
+- 提供 .csproj 套件參考（Microsoft.Bcl.TimeProvider）
 
 ## 參考資源
 

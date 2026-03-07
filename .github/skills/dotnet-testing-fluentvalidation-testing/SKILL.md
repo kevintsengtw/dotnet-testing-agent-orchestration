@@ -2,20 +2,11 @@
 name: dotnet-testing-fluentvalidation-testing
 description: |
   測試 FluentValidation 驗證器的專門技能。當需要為 Validator 類別建立測試、驗證業務規則、測試錯誤訊息時使用。涵蓋 FluentValidation.TestHelper 完整使用、ShouldHaveValidationErrorFor、非同步驗證、跨欄位邏輯等。
+  Make sure to use this skill whenever the user mentions FluentValidation testing, Validator testing, ShouldHaveValidationErrorFor, TestHelper, or testing business validation rules, even if they don't explicitly ask for validation testing guidance.
   Keywords: validator, 驗證器, fluentvalidation, validation testing, UserValidator, CreateOrderValidator, TestHelper, ShouldHaveValidationErrorFor, ShouldNotHaveValidationErrorFor, TestValidate, TestValidateAsync, 測試驗證器, 驗證業務規則
-license: MIT
-metadata:
-  author: Kevin Tseng
-  version: "1.0.0"
-  tags: ".NET, testing, FluentValidation, validator, validation"
-  related_skills: "awesome-assertions-guide, nsubstitute-mocking, unit-test-fundamentals"
 ---
 
 # FluentValidation 驗證器測試指南
-
-## 適用情境
-
-此技能專注於使用 FluentValidation.TestHelper 測試資料驗證邏輯，涵蓋基本驗證、複雜業務規則、非同步驗證和測試最佳實踐。
 
 ## 為什麼要測試驗證器？
 
@@ -55,7 +46,7 @@ using AwesomeAssertions;
 
 本節涵蓋 7 種核心測試模式，每種模式包含驗證器定義與完整測試範例。
 
-> 📖 完整程式碼範例請參考 [references/core-test-patterns.md](references/core-test-patterns.md)
+> 完整程式碼範例請參考 [references/core-test-patterns.md](references/core-test-patterns.md)
 
 - **模式 1：基本欄位驗證** — 使用 `TestValidate` + `ShouldHaveValidationErrorFor` / `ShouldNotHaveValidationErrorFor` 測試單一欄位規則
 - **模式 2：參數化測試** — 使用 `[Theory]` + `[InlineData]` 測試多種無效/有效輸入組合
@@ -110,7 +101,7 @@ public class UserValidatorTests
 
 ## 測試最佳實踐
 
-### ✅ 推薦做法
+### 推薦做法
 
 1. **使用參數化測試** - 用 Theory 測試多種輸入組合
 2. **測試邊界值** - 特別注意邊界條件
@@ -120,7 +111,7 @@ public class UserValidatorTests
 6. **清楚的測試命名** - 使用 `方法_情境_預期結果` 格式
 7. **測試錯誤訊息** - 確保使用者看到正確的錯誤訊息
 
-### ❌ 避免做法
+### 避免做法
 
 1. **避免使用 DateTime.Now** - 會導致測試不穩定
 2. **避免測試過度耦合** - 每個測試只驗證一個規則
@@ -268,6 +259,13 @@ _fakeTimeProvider.SetUtcNow(new DateTime(2024, 1, 1));
 
 - `templates/validator-test-template.cs`: 完整的驗證器測試範例
 - `templates/async-validator-examples.cs`: 非同步驗證範例
+
+## 輸出格式
+
+- 產生 Validator 測試類別（含 TestHelper 設定）
+- 使用 ShouldHaveValidationErrorFor/ShouldNotHaveValidationErrorFor 斷言
+- 包含非同步驗證、跨欄位邏輯測試範例
+- 提供 .csproj 套件參考（FluentValidation.TestHelper）
 
 ## 參考資源
 
