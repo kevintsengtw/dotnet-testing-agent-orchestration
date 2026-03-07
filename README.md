@@ -85,7 +85,7 @@ flowchart TD
 
 ### Agent Skills
 
-本工作區包含 **dotnet-testing-agent-skills v2.2.0** 的完整技能集合，共 **30 個 Skills**（2 個總覽 + 27 個專業 + 1 個第三方），分為五大階段：
+本工作區包含 **dotnet-testing-agent-skills v2.3.0** 的完整技能集合，共 **30 個 Skills**（2 個總覽 + 27 個專業 + 1 個第三方），分為五大階段：
 
 | 階段           | 內容                                                   | 技能數量 |
 | -------------- | ------------------------------------------------------ | -------- |
@@ -247,7 +247,7 @@ git clean -fd samples/
 
 | 專案                                                                                       | 說明                                       |
 | ------------------------------------------------------------------------------------------ | ------------------------------------------ |
-| [dotnet-testing-agent-skills](https://github.com/kevintsengtw/dotnet-testing-agent-skills) | .NET Testing Agent Skills 原始碼（v2.2.0） |
+| [dotnet-testing-agent-skills](https://github.com/kevintsengtw/dotnet-testing-agent-skills) | .NET Testing Agent Skills 原始碼（v2.3.0） |
 
 ---
 
