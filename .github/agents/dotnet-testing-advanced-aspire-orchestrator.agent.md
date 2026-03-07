@@ -124,6 +124,24 @@ model: ['Claude Sonnet 4.6 (copilot)', 'Claude Opus 4.6 (copilot)']
 
 ---
 
+## 執行進度顯示規範
+
+**每次委派 subagent 之前，你必須先向使用者輸出明顯的階段標題**，讓使用者清楚掌握執行進度。收到回傳後，輸出 1-2 句過渡摘要再進入下一階段。
+
+### 各階段必要輸出
+
+| 動作時機 | 必輸出文字 |
+|---------|----------|
+| 委派 Aspire Analyzer **前** | `## 階段 1：委派分析（Aspire Analyzer）` |
+| Analyzer 回傳後 | `Analyzer 分析完成！識別出 N 個 Resources、M 個端點、容器依賴：[清單]。現在委派 Aspire Writer 撰寫測試。` |
+| 委派 Aspire Writer **前** | `## 階段 2：委派撰寫（Aspire Writer）` |
+| Writer 回傳後 | `Writer 完成！已建立 Aspire 測試基礎設施與測試類別，共 N 個測試案例。現在委派 Aspire Executor 建置與執行。` |
+| 委派 Aspire Executor **前** | `## 階段 3：委派執行（Aspire Executor）` |
+| Executor 回傳後 | `全數通過！N 個測試案例通過，AppHost 啟動時間 ~Ts。現在委派 Aspire Reviewer 進行品質審查。` |
+| 委派 Aspire Reviewer **前** | `## 階段 4：委派審查（Aspire Reviewer）` |
+
+---
+
 ## 結果整合與呈現
 
 收到四個 subagent 的回傳結果後，你必須整合呈現給使用者：

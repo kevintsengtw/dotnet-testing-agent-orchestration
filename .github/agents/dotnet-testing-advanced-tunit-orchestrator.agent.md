@@ -130,6 +130,24 @@ model: ['Claude Sonnet 4.6 (copilot)', 'Claude Opus 4.6 (copilot)']
 
 ---
 
+## 執行進度顯示規範
+
+**每次委派 subagent 之前，你必須先向使用者輸出明顯的階段標題**，讓使用者清楚掌握執行進度。收到回傳後，輸出 1-2 句過渡摘要再進入下一階段。
+
+### 各階段必要輸出
+
+| 動作時機 | 必輸出文字 |
+|---------|----------|
+| 委派 TUnit Analyzer **前** | `## 階段 1：委派分析（TUnit Analyzer）` |
+| Analyzer 回傳後 | `Analyzer 分析完成！識別出 N 個類別，TUnit 功能需求：[功能清單]，需要 [Skills 清單]。現在委派 TUnit Writer 撰寫測試。` |
+| 委派 TUnit Writer **前** | `## 階段 2：委派撰寫（TUnit Writer）` |
+| Writer 回傳後 | `Writer 完成！已建立測試檔案，共 N 個測試案例（含 [Arguments]/[MethodDataSource] 展開）。現在委派 TUnit Executor 建置與執行。` |
+| 委派 TUnit Executor **前** | `## 階段 3：委派執行（TUnit Executor）` |
+| Executor 回傳後 | `全數通過！N 個測試案例通過（dotnet run，Engine Mode：SourceGenerated）。現在委派 TUnit Reviewer 進行品質審查。` |
+| 委派 TUnit Reviewer **前** | `## 階段 4：委派審查（TUnit Reviewer）` |
+
+---
+
 ## 結果整合與呈現
 
 收到四個 subagent 的回傳結果後，你必須整合呈現給使用者：
