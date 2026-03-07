@@ -2,20 +2,11 @@
 name: dotnet-testing-complex-object-comparison
 description: |
   處理複雜物件比對與深層驗證的專門技能。當需要比對深層物件、排除特定屬性、處理循環參照、驗證 DTO/Entity 時使用。涵蓋 BeEquivalentTo、Excluding、Including、自訂比對規則等。
+  Make sure to use this skill whenever the user mentions deep object comparison, BeEquivalentTo, DTO comparison, Excluding properties, or complex object validation in tests, even if they don't explicitly ask for comparison guidance.
   Keywords: object comparison, 物件比對, deep comparison, 深層比對, BeEquivalentTo, DTO 比對, Entity 驗證, 排除屬性, 循環參照, Excluding, Including, ExcludingNestedObjects, RespectingRuntimeTypes, WithStrictOrdering, 忽略時間戳記, exclude timestamp
-license: MIT
-metadata:
-  author: Kevin Tseng
-  version: "1.0.0"
-  tags: ".NET, testing, object comparison, BeEquivalentTo, AwesomeAssertions"
-  related_skills: "awesome-assertions-guide, autofixture-basics, test-data-builder-pattern"
 ---
 
 # 複雜物件比對指南（Complex Object Comparison）
-
-## 適用情境
-
-此技能專注於 .NET 測試中的複雜物件比對場景，使用 AwesomeAssertions 的 `BeEquivalentTo` API 處理各種進階比對需求。
 
 ## 核心使用場景
 
@@ -82,7 +73,7 @@ public void TreeStructure_循環參照_應正確處理()
 
 AwesomeAssertions 還提供多種進階比對模式：動態欄位排除（排除時間戳記、自動生成欄位）、巢狀物件欄位排除、大量資料效能最佳化比對（選擇性屬性比對、抽樣驗證策略）、以及嚴格/寬鬆排序控制。
 
-> 📖 完整程式碼範例請參閱 [references/detailed-comparison-patterns.md](references/detailed-comparison-patterns.md)
+> 完整程式碼範例請參閱 [references/detailed-comparison-patterns.md](references/detailed-comparison-patterns.md)
 
 ## 比對選項速查表
 
@@ -208,7 +199,7 @@ public void MultipleComparisons_批次驗證_應一次顯示所有失敗()
 
 ## 最佳實踐建議
 
-### ✅ 推薦做法
+### 推薦做法
 
 1. **優先使用屬性排除而非包含**：除非只需驗證少數屬性，否則使用 `Excluding` 更清楚
 2. **建立可重用的排除擴充方法**：避免在每個測試重複排除邏輯
@@ -216,7 +207,7 @@ public void MultipleComparisons_批次驗證_應一次顯示所有失敗()
 4. **使用 AssertionScope 進行批次驗證**：一次看到所有失敗原因
 5. **提供有意義的 because 說明**：幫助未來維護者理解測試意圖
 
-### ❌ 避免做法
+### 避免做法
 
 1. **避免過度依賴完整物件比對**：考慮只驗證關鍵屬性
 2. **避免忽略循環參照問題**：使用 `IgnoringCyclicReferences()` 明確處理
@@ -267,6 +258,13 @@ options.WithTracing()  // 產生詳細的比對追蹤資訊
 
 - `templates/comparison-patterns.cs`: 常見比對模式範例
 - `templates/exclusion-strategies.cs`: 欄位排除策略與擴充方法
+
+## 輸出格式
+
+- 產生使用 BeEquivalentTo 的深層物件比對斷言
+- 包含 Excluding/Including 屬性過濾設定
+- 提供自訂比對規則與循環參照處理範例
+- 包含 DTO/Entity 比對的完整測試程式碼
 
 ## 參考資源
 

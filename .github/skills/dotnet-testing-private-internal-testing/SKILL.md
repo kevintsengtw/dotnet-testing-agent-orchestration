@@ -2,28 +2,13 @@
 name: dotnet-testing-private-internal-testing
 description: |
   Private 與 Internal 成員測試策略指南。當需要測試私有或內部成員、設定 InternalsVisibleTo 或評估可測試性設計時使用。涵蓋設計優先思維、反射測試、策略模式重構、AbstractLogger 模式與決策框架。
+  Make sure to use this skill whenever the user mentions private method testing, internal testing, InternalsVisibleTo, reflection testing, or testability design, even if they don't explicitly ask for testing strategy guidance.
   Keywords: private method testing, internal testing, InternalsVisibleTo, 私有方法測試, 內部成員測試, 反射測試, reflection testing, GetMethod BindingFlags, Meziantou.MSBuild.InternalsVisibleTo, 可測試性設計, 策略模式重構, testability
-license: MIT
-metadata:
-  author: Kevin Tseng
-  version: "1.0.0"
-  tags: "private-testing, internal-testing, InternalsVisibleTo, reflection, testability, design"
-  related_skills: "nsubstitute-mocking, unit-test-fundamentals, test-naming-conventions"
 ---
 
 # 私有與內部成員測試策略指南
 
 本技能協助您在 .NET 測試中正確處理私有與內部成員的測試，強調設計優先的測試思維。
-
-## 適用情境
-
-當被要求執行以下任務時，請使用此技能：
-
-- 測試 private 或 internal 方法與屬性
-- 設定 InternalsVisibleTo 存取內部成員
-- 評估是否需要測試私有方法或應重構設計
-- 使用反射（Reflection）存取私有成員
-- 提升程式碼的可測試性設計
 
 ## 核心原則：設計優先思維
 
@@ -35,10 +20,10 @@ metadata:
 
 當你想測試私有方法時，先檢查以下徵兆：
 
-- ❌ 私有方法超過 10 行且包含複雜邏輯
-- ❌ 私有方法包含重要的業務規則
-- ❌ 私有方法難以透過公開方法間接測試
-- ❌ 類別承擔多個職責
+- 私有方法超過 10 行且包含複雜邏輯
+- 私有方法包含重要的業務規則
+- 私有方法難以透過公開方法間接測試
+- 類別承擔多個職責
 
 ### 解決方案：重構而非測試
 
@@ -96,16 +81,16 @@ public class DiscountCalculator : IDiscountCalculator
 
 **適合的情境：**
 
-- ✅ 框架或類別庫開發
-- ✅ 複雜的內部演算法驗證
-- ✅ 效能關鍵的內部組件
-- ✅ 安全相關的內部邏輯
+- 框架或類別庫開發
+- 複雜的內部演算法驗證
+- 效能關鍵的內部組件
+- 安全相關的內部邏輯
 
 **不適合的情境：**
 
-- ❌ 應用層的業務邏輯（應該是 public）
-- ❌ 簡單的輔助方法
-- ❌ 可以透過公開 API 間接測試的邏輯
+- 應用層的業務邏輯（應該是 public）
+- 簡單的輔助方法
+- 可以透過公開 API 間接測試的邏輯
 
 ### 方法一：使用 InternalsVisibleTo 屬性
 
@@ -197,7 +182,7 @@ using System.Runtime.CompilerServices;
 
 涵蓋決策樹（是否應測試私有方法）、反射測試私有實例方法與靜態方法、`ReflectionTestHelper` 輔助類別封裝，以及反射測試的風險與最佳實踐。
 
-> 📖 完整程式碼範例與技術細節請參考 [references/private-method-testing.md](references/private-method-testing.md)
+> 完整程式碼範例與技術細節請參考 [references/private-method-testing.md](references/private-method-testing.md)
 
 ## 測試友善的設計模式
 
@@ -252,7 +237,7 @@ public class StandardDiscountStrategy : IDiscountStrategy
         // 折扣邏輯現在是公開方法，容易測試
         if (customer.IsVIP)
             return product.BasePrice * 0.1m;
-        
+
         return 0;
     }
 }
@@ -313,9 +298,9 @@ public class DataProcessor
 
         var data = TransformData(input);
         var saved = SaveData(data); // 想模擬這個方法避免實際資料庫操作
-        
-        return saved 
-            ? ProcessResult.Success() 
+
+        return saved
+            ? ProcessResult.Success()
             : ProcessResult.Failed();
     }
 
@@ -390,9 +375,9 @@ public void Process_使用部分模擬_應成功處理()
 
 評估測試價值：
 
-- ✅ 能抓到真實的業務邏輯錯誤
-- ✅ 提供清楚的失敗訊息
-- ✅ 在合理成本下長期穩定運行
+- 能抓到真實的業務邏輯錯誤
+- 提供清楚的失敗訊息
+- 在合理成本下長期穩定運行
 
 **建議行動：**
 
@@ -410,50 +395,25 @@ public void Process_使用部分模擬_應成功處理()
 | 安全相關私有邏輯        | 重構或使用反射測試      | 需要獨立驗證正確性   |
 | 頻繁變動的實作細節      | 避免直接測試            | 測試會變得脆弱       |
 
-## DO - 建議做法
+## 最佳實踐
 
-1. **設計優先**
-   - ✅ 優先考慮重構而非測試私有方法
-   - ✅ 使用依賴注入和介面抽象
-   - ✅ 應用策略模式分離複雜邏輯
-   - ✅ 保持單一職責原則
+1. **設計優先** — 需要測試私有方法通常意味著類別承擔了過多責任。優先考慮重構（依賴注入、策略模式、責任分離），讓邏輯透過公開 API 自然可測。
 
-2. **測試公開行為**
-   - ✅ 專注測試公開 API 的行為
-   - ✅ 透過公開方法間接測試私有邏輯
-   - ✅ 使用整合測試覆蓋複雜流程
+2. **測試公開行為** — 專注測試公開 API 的行為，透過公開方法間接覆蓋私有邏輯。這讓測試更穩定，不會因重構內部實作而失敗。
 
-3. **明智使用 InternalsVisibleTo**
-   - ✅ 僅用於框架或類別庫開發
-   - ✅ 使用 Meziantou.MSBuild.InternalsVisibleTo 簡化設定
-   - ✅ 記錄為何需要開放 internal 可見性
+3. **明智使用 InternalsVisibleTo** — 僅用於框架或類別庫開發場景，因為這類程式碼的 internal 成員確實需要獨立驗證。使用 Meziantou.MSBuild.InternalsVisibleTo 簡化設定，並記錄開放的理由。
 
-4. **謹慎使用反射**
-   - ✅ 建立輔助方法封裝反射邏輯
-   - ✅ 在測試名稱中標示使用反射
-   - ✅ 定期檢視是否可以重構
+4. **謹慎使用反射** — 反射是最後手段，建立輔助方法封裝反射邏輯以降低維護成本，並在測試名稱中標示使用反射以提醒團隊。
 
-## DON'T - 避免做法
+## 常見誤區
 
-1. **不要過度測試私有方法**
-   - ❌ 避免為每個私有方法寫測試
-   - ❌ 不要測試簡單的 getter/setter
-   - ❌ 避免測試純粹的委派呼叫
+1. **過度測試私有方法** — 為每個私有方法寫測試會讓測試套件變得脆弱，重構時大量測試會失敗。簡單的 getter/setter 和委派呼叫不需要獨立測試。
 
-2. **不要忽略設計問題**
-   - ❌ 不要把測試當作設計問題的替代方案
-   - ❌ 避免因為測試而破壞封裝
-   - ❌ 不要讓測試阻礙重構
+2. **忽略設計問題** — 用測試技巧繞過封裝（如大量使用反射）只是治標不治本，根本問題在於類別設計需要改善。測試應推動更好的設計，而非成為設計問題的遮蓋。
 
-3. **不要依賴實作細節**
-   - ❌ 避免測試私有方法的呼叫順序
-   - ❌ 不要驗證私有欄位的值
-   - ❌ 避免測試頻繁變動的實作細節
+3. **依賴實作細節** — 測試私有方法的呼叫順序或驗證私有欄位的值，會讓測試與實作緊密耦合，任何內部重構都會導致測試失敗。
 
-4. **不要濫用 InternalsVisibleTo**
-   - ❌ 不要為應用層程式碼開放 internal
-   - ❌ 避免過多的測試專案可見性
-   - ❌ 不要用它取代適當的公開 API
+4. **濫用 InternalsVisibleTo** — 為應用層程式碼開放 internal 會破壞封裝邊界，讓測試依賴不該公開的內部結構。
 
 ## 範例參考
 
@@ -462,6 +422,14 @@ public void Process_使用部分模擬_應成功處理()
 - `internals-visible-to-examples.cs` - InternalsVisibleTo 設定範例
 - `reflection-testing-examples.cs` - 反射測試技術範例
 - `strategy-pattern-refactoring.cs` - 策略模式重構範例
+
+## 輸出格式
+
+- 產生測試類別檔案（`*Tests.cs`），包含私有或內部成員的測試方法
+- 若需要 InternalsVisibleTo 設定，修改目標專案的 `.csproj` 或 `AssemblyInfo.cs`
+- 若建議重構，產生提取後的策略介面與實作類別（`.cs`）
+- 若使用反射測試，產生 `ReflectionTestHelper.cs` 輔助類別
+- 提供決策建議說明，標示選擇的測試策略與理由
 
 ## 參考資源
 

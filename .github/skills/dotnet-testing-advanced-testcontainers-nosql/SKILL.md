@@ -2,29 +2,11 @@
 name: dotnet-testing-advanced-testcontainers-nosql
 description: |
   Testcontainers NoSQL 整合測試完整指南。當需要對 MongoDB 或 Redis 進行容器化整合測試時使用。涵蓋 MongoDB 文件操作、Redis 五種資料結構、Collection Fixture 模式。包含 BSON 序列化、索引效能測試、資料隔離策略與容器生命週期管理。
+  Make sure to use this skill whenever the user mentions Testcontainers MongoDB, Testcontainers Redis, NoSQL integration test, BSON serialization, or Redis data structure testing, even if they don't explicitly ask for NoSQL container testing.
   Keywords: testcontainers mongodb, testcontainers redis, mongodb integration test, redis integration test, nosql testing, MongoDbContainer, RedisContainer, IMongoDatabase, IConnectionMultiplexer, BSON serialization, BsonDocument, 文件模型測試, 快取測試, Collection Fixture
-license: MIT
-metadata:
-  author: Kevin Tseng
-  version: "1.0.0"
-  tags: "testcontainers, mongodb, redis, nosql, integration-testing, bson"
-  related_skills: "advanced-testcontainers-database, advanced-aspire-testing, advanced-webapi-integration-testing"
 ---
 
 # Testcontainers NoSQL 整合測試指南
-
-## 適用情境
-
-當被要求執行以下任務時，請使用此技能：
-
-- 使用 Testcontainers 測試 MongoDB 文件操作
-- 使用 Testcontainers 測試 Redis 快取服務
-- 建立 MongoDB Collection Fixture 共享容器
-- 建立 Redis Collection Fixture 共享容器
-- 測試 MongoDB BSON 序列化與複雜文件結構
-- 測試 MongoDB 索引效能與唯一性約束
-- 測試 Redis 五種資料結構（String、Hash、List、Set、Sorted Set）
-- 實作 NoSQL 資料庫的資料隔離策略
 
 ## 核心概念
 
@@ -100,7 +82,7 @@ NoSQL 資料庫測試與關聯式資料庫有顯著差異：
 
 涵蓋 MongoDB Container Fixture 建立、複雜文件模型設計（巢狀物件、陣列、字典）、BSON 序列化測試、CRUD 操作測試（含樂觀鎖定）以及索引效能與唯一性約束測試。使用 Collection Fixture 模式共享容器，節省 80% 以上的測試時間。
 
-> 📖 完整程式碼範例請參考 [MongoDB 容器化測試詳細指南](references/mongodb-testing.md)
+> 完整程式碼範例請參考 [MongoDB 容器化測試詳細指南](references/mongodb-testing.md)
 
 ---
 
@@ -108,7 +90,7 @@ NoSQL 資料庫測試與關聯式資料庫有顯著差異：
 
 涵蓋 Redis Container Fixture 建立、快取模型設計（CacheItem 泛型包裝器、UserSession、RecentView、LeaderboardEntry）以及 Redis 五種資料結構（String、Hash、List、Set、Sorted Set）的完整測試範例，包含 TTL 過期測試與資料隔離策略。
 
-> 📖 完整程式碼範例請參考 [Redis 容器化測試詳細指南](references/redis-testing.md)
+> 完整程式碼範例請參考 [Redis 容器化測試詳細指南](references/redis-testing.md)
 
 ---
 
@@ -221,6 +203,13 @@ _container = new MongoDbBuilder()
 - [nsubstitute-mocking](../../dotnet-testing/nsubstitute-mocking/SKILL.md) - 測試替身與 Mock
 
 ---
+
+## 輸出格式
+
+- 產生 Container Fixture 類別（MongoDB/Redis 容器管理）
+- 產生測試類別含 Collection Fixture 設定
+- 提供 .csproj 套件參考配置
+- 包含資料隔離與容器生命週期管理程式碼
 
 ## 參考資源
 

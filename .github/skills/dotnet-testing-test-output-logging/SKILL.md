@@ -2,28 +2,13 @@
 name: dotnet-testing-test-output-logging
 description: |
   xUnit 測試輸出與記錄完整指南。當需要在 xUnit 測試中實作測試輸出、診斷記錄或 ILogger 替代品時使用。涵蓋 ITestOutputHelper 注入、AbstractLogger 模式、結構化輸出設計。包含 XUnitLogger、CompositeLogger、效能測試診斷工具實作。
+  Make sure to use this skill whenever the user mentions ITestOutputHelper, test output, test logging, XUnitLogger, AbstractLogger, or ILogger testing in xUnit, even if they don't explicitly ask for test output guidance.
   Keywords: ITestOutputHelper, ILogger testing, test output xunit, 測試輸出, 測試記錄, AbstractLogger, XUnitLogger, CompositeLogger, testOutputHelper.WriteLine, 測試診斷, logger mock, 測試日誌, 結構化輸出, Received().Log
-license: MIT
-metadata:
-  author: Kevin Tseng
-  version: "1.0.0"
-  tags: "xunit, ITestOutputHelper, ILogger, testing, diagnostics, logging"
-  related_skills: "unit-test-fundamentals, nsubstitute-mocking, xunit-project-setup"
 ---
 
 # 測試輸出與記錄專家指南
 
 本技能協助您在 .NET xUnit 測試專案中實作高品質的測試輸出與記錄機制。
-
-## 適用情境
-
-當被要求執行以下任務時，請使用此技能：
-
-- 在 xUnit 測試中使用 ITestOutputHelper 輸出診斷資訊
-- 實作 ILogger 的測試替代品（XUnitLogger）
-- 建立 AbstractLogger 或 CompositeLogger 模式
-- 設計結構化測試輸出進行除錯
-- 實作效能測試診斷工具
 
 ## 核心原則
 
@@ -49,9 +34,9 @@ public class MyTests
 
 **常見錯誤**
 
-- ❌ 靜態存取：`private static ITestOutputHelper _output`
-- ❌ 在非同步測試中未等待即使用
-- ❌ 嘗試在 Dispose 方法中使用
+- 靜態存取：`private static ITestOutputHelper _output`
+- 在非同步測試中未等待即使用
+- 嘗試在 Dispose 方法中使用
 
 ### 2. 結構化輸出格式設計
 
@@ -268,41 +253,25 @@ public abstract class DiagnosticTestBase
 }
 ```
 
-## DO - 建議做法
+## 最佳實踐
 
 1. **適當使用 ITestOutputHelper**
-   - ✅ 在複雜測試中記錄重要步驟
-   - ✅ 採用一致的結構化輸出格式
-   - ✅ 測試失敗時提供診斷資訊
-   - ✅ 在效能測試中記錄時間點
+   - 在複雜測試中記錄重要步驟，幫助追蹤失敗原因
+   - 採用一致的結構化輸出格式（章節標題、時間戳記），讓輸出易於閱讀
+   - 在效能測試中記錄時間點，提供量化數據
 
 2. **Logger 測試策略**
-   - ✅ 使用抽象層（AbstractLogger）簡化測試
-   - ✅ 驗證記錄層級而非完整訊息
-   - ✅ 使用 CompositeLogger 結合 Mock 與實際輸出
-   - ✅ 確保敏感資料不被記錄
+   - 使用抽象層（AbstractLogger）簡化測試，因為 ILogger 擴充方法無法直接 Mock
+   - 驗證記錄層級而非完整訊息，避免測試因訊息文字微調而失敗
+   - 使用 CompositeLogger 結合 Mock 與實際輸出，同時達成驗證與診斷
 
-3. **結構化輸出**
-   - ✅ 使用章節標題分隔不同階段
-   - ✅ 包含時間戳記便於追蹤
-   - ✅ 提供足夠的上下文資訊
+## 常見誤區
 
-## DON'T - 避免做法
+1. **過度使用輸出** — 大量輸出會拖慢測試執行速度，且雜訊會淹沒有用資訊。只在複雜或易失敗的測試中加入輸出即可。記錄敏感資訊（密碼、金鑰）也是常見的安全風險。
 
-1. **不要過度使用輸出**
-   - ❌ 避免在每個測試中都大量輸出
-   - ❌ 不要記錄敏感資訊（密碼、金鑰）
-   - ❌ 避免影響測試執行效能
+2. **硬編碼記錄驗證** — 驗證完整的記錄訊息字串容易因訊息微調而失敗，驗證呼叫次數則過度指定了內部實作。改為驗證記錄層級和關鍵字即可。
 
-2. **不要硬編碼記錄驗證**
-   - ❌ 避免驗證完整的記錄訊息（易碎）
-   - ❌ 不要驗證記錄呼叫的確切次數（過度指定）
-   - ❌ 避免測試內部實作細節
-
-3. **不要忽略生命週期**
-   - ❌ 不要在靜態方法中使用 ITestOutputHelper
-   - ❌ 不要嘗試跨測試方法共用實例
-   - ❌ 避免在非同步測試中遺漏等待
+3. **忽略生命週期** — ITestOutputHelper 的實例與測試方法綁定，在靜態方法或跨測試方法中使用會拋出例外。非同步測試中遺漏 await 也可能導致輸出遺失。
 
 ## 範例參考
 
@@ -311,6 +280,13 @@ public abstract class DiagnosticTestBase
 - `itestoutputhelper-example.cs` - ITestOutputHelper 使用範例
 - `ilogger-testing-example.cs` - ILogger 測試策略範例
 - `diagnostic-tools.cs` - XUnitLogger 與 CompositeLogger 實作
+
+## 輸出格式
+
+- 產生含 ITestOutputHelper 注入的測試類別
+- 提供 AbstractLogger/XUnitLogger/CompositeLogger 實作程式碼
+- 包含結構化輸出的 helper 方法
+- ILogger 驗證使用底層 Log 方法而非擴充方法
 
 ## 參考資源
 
@@ -332,6 +308,12 @@ public abstract class DiagnosticTestBase
 - `xunit-project-setup` - xUnit 專案設定
 - `nsubstitute-mocking` - 測試替身與模擬
 
+### 範例檔案
+
+- [templates/itestoutputhelper-example.cs](templates/itestoutputhelper-example.cs) - ITestOutputHelper 使用範例
+- [templates/ilogger-testing-example.cs](templates/ilogger-testing-example.cs) - ILogger 測試範例
+- [templates/diagnostic-tools.cs](templates/diagnostic-tools.cs) - 診斷工具實作
+
 ## 測試清單
 
 在實作測試輸出與記錄時，確認以下檢查項目：
@@ -344,11 +326,3 @@ public abstract class DiagnosticTestBase
 - [ ] 沒有在輸出中洩漏敏感資訊
 - [ ] 非同步測試正確等待記錄完成
 - [ ] 測試失敗時提供足夠的診斷資訊
-
-## 參考資源
-
-請參考同目錄下的範例檔案：
-
-- [templates/itestoutputhelper-example.cs](templates/itestoutputhelper-example.cs) - ITestOutputHelper 使用範例
-- [templates/ilogger-testing-example.cs](templates/ilogger-testing-example.cs) - ILogger 測試範例
-- [templates/diagnostic-tools.cs](templates/diagnostic-tools.cs) - 診斷工具實作

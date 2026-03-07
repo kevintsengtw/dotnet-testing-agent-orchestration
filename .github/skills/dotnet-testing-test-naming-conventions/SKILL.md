@@ -2,25 +2,11 @@
 name: dotnet-testing-test-naming-conventions
 description: |
   測試命名規範與最佳實踐的專門技能。當需要為測試方法命名、改進測試可讀性、建立命名標準時使用。涵蓋三段式命名法、中文命名建議、測試類別命名等。
+  Make sure to use this skill whenever the user mentions test naming, how to name tests, test readability, or test method naming conventions, even if they don't explicitly ask for naming guidance.
   Keywords: test naming, 測試命名, naming conventions, 命名規範, 三段式命名, three-part naming, method_scenario_expected, 方法_情境_預期, 如何命名測試, 測試可讀性, test readability, 命名最佳實踐, 測試報告, test documentation
-license: MIT
-metadata:
-  author: Kevin Tseng
-  version: "1.0.0"
-  tags: ".NET, testing, naming conventions, test naming, readability"
-  related_skills: "unit-test-fundamentals, test-output-logging, xunit-project-setup"
 ---
 
 # .NET 測試命名規範指南
-
-## 適用情境
-
-當被要求執行以下任務時，請使用此技能：
-
-- 為測試方法或測試類別命名
-- 檢視並改進現有測試的命名
-- 確保測試報告的可讀性
-- 建立團隊一致的測試命名標準
 
 ## 測試方法命名規範
 
@@ -42,9 +28,9 @@ metadata:
 
 ## 命名範例對照表
 
-### ✅ 好的命名 vs ❌ 不好的命名
+### 好的命名 vs 不好的命名
 
-| ❌ 不好的命名 | ✅ 好的命名                                         | 原因                       |
+| 不好的命名 | 好的命名                                         | 原因                       |
 | ------------- | --------------------------------------------------- | -------------------------- |
 | `TestAdd`     | `Add_輸入1和2_應回傳3`                              | 清楚說明測試情境與預期結果 |
 | `Test1`       | `Add_輸入負數和正數_應回傳正確結果`                 | 有意義的描述               |
@@ -257,15 +243,22 @@ public void IsValidEmail_輸入無效Email格式_應回傳False(string invalidEm
 好的命名會讓測試報告更易讀：
 
 ```text
-✅ CalculatorTests
-   ✅ Add_輸入1和2_應回傳3
-   ✅ Add_輸入負數和正數_應回傳正確結果
-   ❌ Divide_輸入10和0_應拋出DivideByZeroException
-   
-✅ EmailHelperTests
-   ✅ IsValidEmail_輸入有效Email_應回傳True
-   ✅ IsValidEmail_輸入null值_應回傳False
+PASS CalculatorTests
+   PASS Add_輸入1和2_應回傳3
+   PASS Add_輸入負數和正數_應回傳正確結果
+   FAIL Divide_輸入10和0_應拋出DivideByZeroException
+
+PASS EmailHelperTests
+   PASS IsValidEmail_輸入有效Email_應回傳True
+   PASS IsValidEmail_輸入null值_應回傳False
 ```
+
+## 輸出格式
+
+- 使用三段式命名法：`[方法名稱]_[測試情境]_[預期行為]`
+- 測試類別命名為 `{被測類別}Tests`
+- 情境描述使用中文以提升可讀性
+- 參數化測試使用「各種」、「有效」、「無效」等詞彙
 
 ## 參考資源
 
@@ -280,3 +273,8 @@ public void IsValidEmail_輸入無效Email格式_應回傳False(string invalidEm
 - **Day 01 - 老派工程師的測試啟蒙**
   - 鐵人賽文章：https://ithelp.ithome.com.tw/articles/10373888
   - 範例程式碼：https://github.com/kevintsengtw/30Days_in_Testing_Samples/tree/main/day01
+
+### 相關技能
+
+- `dotnet-testing-unit-test-fundamentals` - 單元測試基礎
+- `dotnet-testing-xunit-project-setup` - xUnit 專案設定
