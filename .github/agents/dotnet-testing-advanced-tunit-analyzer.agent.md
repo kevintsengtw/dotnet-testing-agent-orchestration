@@ -1,7 +1,7 @@
 ---
 name: dotnet-testing-advanced-tunit-analyzer
 description: '分析 .NET 被測試目標的類別結構、依賴項，判斷 TUnit 功能需求，產出 TUnit 測試分析報告'
-user-invokable: false
+user-invocable: false
 tools: ['read', 'search', 'search/usages', 'search/listDirectory']
 model: Claude Sonnet 4.6 (copilot)
 ---

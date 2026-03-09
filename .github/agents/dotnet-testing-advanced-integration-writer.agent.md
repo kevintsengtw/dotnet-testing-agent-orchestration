@@ -1,8 +1,8 @@
 ---
 name: dotnet-testing-advanced-integration-writer
 description: '根據 Analyzer 分析結果載入對應的整合測試 Agent Skills，撰寫符合最佳實踐的 .NET WebAPI 整合測試'
-user-invokable: false
-tools: ['read', 'search', 'create', 'edit', 'execute/getTerminalOutput','execute/runInTerminal','read/terminalLastCommand','read/terminalSelection']
+user-invocable: false
+tools: ['read', 'search', 'edit', 'execute/getTerminalOutput','execute/runInTerminal','read/terminalLastCommand','read/terminalSelection']
 model: ['Claude Sonnet 4.6 (copilot)', 'GPT-5.1-Codex-Max (copilot)']
 ---
 
