@@ -81,6 +81,17 @@ model: ['Claude Sonnet 4.6 (copilot)', 'Claude Opus 4.6 (copilot)']
 
 將分析結果交給 **dotnet-testing-advanced-integration-writer** subagent 撰寫測試。
 
+#### ⚠️ 分階段委派判斷（必讀）
+
+在組裝 Writer prompt 之前，先計算 `suggestedTestScenarios` 的數量：
+
+| 測試案例數量 | 策略 | 說明 |
+|------------|------|------|
+| ≤ 15 個 | **單次委派** | 一次委派，要求 Writer 產出所有基礎設施 + 全部測試案例 |
+| **> 15 個** | **分兩次委派** | **第一次**：僅要求基礎設施（`GlobalUsings.cs`、WebApiFactory、IntegrationTestBase、`.csproj` 更新）；**第二次**：在第一次完成後，要求撰寫測試案例（`XxxControllerTests.cs`），並明確告知基礎設施已存在於哪些路徑 |
+
+> **驗證教訓（P1-6）**：當 `suggestedTestScenarios` 超過 15 個時（如 28 個），Writer 若試圖在單次回應中產出 4 個檔案（含完整 500+ 行測試方法體），會超出 LLM 輸出 token 上限，導致「回應已達到長度限制」錯誤。此判斷邏輯為**必執行步驟**，不可省略。
+
 **傳給 Writer 的 prompt 必須包含：**
 
 1. **完整的分析報告 JSON**（來自 Analyzer，包含 `existingTestInfrastructure` 欄位）
@@ -220,6 +231,16 @@ model: ['Claude Sonnet 4.6 (copilot)', 'Claude Opus 4.6 (copilot)']
 1. 將失敗訊息和 Executor 的分析一併傳給 Reviewer
 2. 在最終結果中明確標示哪些測試失敗
 3. 區分「環境問題」和「程式邏輯問題」— 環境問題建議使用者手動排除
+
+### Writer 回傳「回應已達到長度限制」
+
+如果 Writer subagent 回傳「很抱歉，回應已達到長度限制。請改寫您的提示。」：
+
+1. **不要重試相同的 prompt** — 原因是輸出 token 超限，重試只會再次失敗
+2. **強制改用分兩次委派策略**（無論 `suggestedTestScenarios` 數量為何）：
+   - **第一次 Writer**：僅傳基礎設施需求（GlobalUsings + WebApiFactory + IntegrationTestBase + csproj），不傳 `suggestedTestScenarios`
+   - **等待第一次成功後**，再進行**第二次 Writer**：傳基礎設施已完成的路徑 + 全部 `suggestedTestScenarios`，僅要求產出測試類別
+3. 在進度顯示中向使用者說明已改用分階段策略
 
 ### Reviewer 發現重大問題
 
