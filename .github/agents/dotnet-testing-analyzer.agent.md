@@ -1,7 +1,7 @@
 ---
 name: dotnet-testing-analyzer
 description: '分析 .NET 被測試目標的類別結構、依賴項、需要的測試技術'
-user-invokable: false
+user-invocable: false
 tools: ['read', 'search', 'search/usages', 'search/listDirectory']
 model: Claude Sonnet 4.6 (copilot)
 ---

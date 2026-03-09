@@ -1,7 +1,7 @@
 ---
 name: dotnet-testing-advanced-aspire-analyzer
 description: '分析 .NET Aspire AppHost 專案的 Resource 結構、服務依賴、容器需求，產出 Aspire 整合測試分析報告'
-user-invokable: false
+user-invocable: false
 tools: ['read', 'search', 'search/usages', 'search/listDirectory']
 model: Claude Sonnet 4.6 (copilot)
 ---

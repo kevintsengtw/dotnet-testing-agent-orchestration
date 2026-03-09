@@ -1,7 +1,7 @@
 ---
 name: dotnet-testing-reviewer
 description: '審查 .NET 單元測試的品質，載入品質相關 Skills 驗證命名、斷言、覆蓋率等最佳實踐'
-user-invokable: false
+user-invocable: false
 tools: ['read', 'search', 'search/listDirectory', 'execute/getTerminalOutput','execute/runInTerminal','read/terminalLastCommand','read/terminalSelection']
 model: ['Claude Sonnet 4.6 (copilot)', 'Claude Opus 4.6 (copilot)']
 ---
