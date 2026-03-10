@@ -52,18 +52,18 @@ model: ['Claude Sonnet 4.6 (copilot)', 'GPT-5.1-Codex-Max (copilot)']
 
 ### Step 3：執行測試確認結果
 
-使用 `runCommands` 執行測試，確認測試都能通過：
+> ⚠️ **此步驟為選擇性執行**：若 Executor 已確認所有測試通過，可直接跳至 Step 4。**重複執行的唯一目的**是在審查期間獨立驗證，而非重新修正問題。
 
-```powershell
-dotnet test <solution-path> --no-build --verbosity minimal
-```
-
-或使用 `dotnet run`：
+若需要自行驗證，使用 `execute/runInTerminal` 工具執行：
 
 ```powershell
 cd <test-project-directory>
 dotnet run --no-build
 ```
+
+> ⚠️ **TUnit 必須使用 `dotnet run`，絕不可使用 `dotnet test`**。`dotnet test` 可能讓 TUnit Source Generator 無法正確運作，導致誤報失敗。
+
+⛔ **硬性原則**：**若此步驟發現測試失敗，只需在報告中記錄「Step 3 驗證發現失敗」，絕不嘗試修改任何程式碼**。Reviewer 沒有也不應該有 `edit` 工具。測試失敗的修正責任屬於 Executor，Reviewer 只負責如實記錄並列在審查報告中。
 
 ### Step 4：逐項審查
 
@@ -227,7 +227,7 @@ dotnet run --no-build
 
 ## 重要原則
 
-1. **只審查，不修改** — 你只產出審查報告，不直接修改任何程式碼
+1. **只審查，不修改** — 你只產出審查報告，不直接修改任何程式碼。**即使發現嚴重問題、即使 Step 3 測試失敗，也絕不嘗試修改程式碼**（你沒有 `edit` 工具，也不應有）
 2. **必定先載入 Skills** — 在審查之前必須完成 Step 1 的 Skill 載入
 3. **依據 Skills 判斷** — 所有審查標準以 Skill 內容為準，而非自創規則
 4. **具體指出位置** — 每個發現必須標注檔案名和行號

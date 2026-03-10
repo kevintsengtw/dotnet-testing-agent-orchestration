@@ -50,9 +50,20 @@ model: Claude Sonnet 4.6 (copilot)
    - 此 Analyzer 專屬於 `dotnet-testing-advanced-tunit-orchestrator`，測試框架固定為 TUnit
    - `projectContext.testFramework` 直接設為 `"tunit"`
 
-4. **將結果寫入輸出**：
+4. **定位方案檔（`.slnx` / `.sln`）（強制執行）**：
+   - 從前一步找到的 `.csproj` 目錄向上逐層查找，使用 `search/listDirectory` 搜尋 `.slnx` 檔案
+   - 若同目錄有多個 `.slnx`，依 `targetFramework` 選對應版本：
+     - `net8.0` → 優先選含 `Net8` 的 `.slnx`（例如 `Practice.TUnit.Net8.slnx`）
+     - `net9.0` → 優先選**不含**版本後綴的 `.slnx`（例如 `Practice.TUnit.slnx`）
+     - `net10.0` → 優先選含 `Net10` 的 `.slnx`（例如 `Practice.TUnit.Net10.slnx`）
+   - 若只有 `.sln`，使用 `.sln` 路徑
+   - 將確認存在的相對路徑（相對 workspace 根目錄）填入 `projectContext.solutionPath`
+   - 若找不到任何方案檔，設為 `"UNKNOWN"`，並在輸出中警告 Executor 需手動確認
+
+5. **將結果寫入輸出**：
    - `projectContext.targetFramework`：目標專案的 TargetFramework
    - `projectContext.testFramework`：固定為 `"tunit"`
+   - `projectContext.solutionPath`：步驟 4 找到的實際方案檔路徑（非 placeholder）
 
 ### Step 2：框架偵測
 
@@ -205,9 +216,9 @@ model: Claude Sonnet 4.6 (copilot)
   "projectContext": {
     "targetFramework": "net9.0",
     "testFramework": "tunit",
-    "solutionPath": "samples/tunit/TUnit.Samples.slnx",
-    "testProjectPath": "samples/tunit/tests/TUnit.Sample.Tests/TUnit.Sample.Tests.csproj",
-    "sourceProjectPath": "samples/verification/src/Verification.Core/Verification.Core.csproj"
+    "solutionPath": "samples/practice_tunit/Practice.TUnit.slnx",
+    "testProjectPath": "samples/practice_tunit/tests/Practice.TUnit.Core.Tests/Practice.TUnit.Core.Tests.csproj",
+    "sourceProjectPath": "samples/practice_tunit/src/Practice.TUnit.Core/Practice.TUnit.Core.csproj"
   }
 }
 ```
