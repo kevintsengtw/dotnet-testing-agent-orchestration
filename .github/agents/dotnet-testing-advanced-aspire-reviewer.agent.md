@@ -33,11 +33,20 @@ model: ['Claude Sonnet 4.6 (copilot)', 'GPT-5.1-Codex-Max (copilot)']
 | `awesome-assertions-guide` | `.github/skills/dotnet-testing-awesome-assertions-guide/SKILL.md` | 斷言品質審查 |
 | `aspire-testing` | `.github/skills/dotnet-testing-advanced-aspire-testing/SKILL.md` | Aspire 測試結構審查 |
 
-### Step 2：讀取所有測試檔案
+### Step 2：讀取測試檔案與原始碼
 
-使用 `search/listDirectory` 定位測試專案目錄，然後使用 `read` 逐一讀取所有測試檔案。
+#### 2a. 原始碼（優先使用 Orchestrator 提供的 sourceCodeContext）
 
-需要讀取的檔案：
+如果 Orchestrator 的委派 prompt 中包含 `sourceCodeContext`，**直接使用這些內容**作為比對基準，無需重新讀取：
+- AppHost `Program.cs`（用於交叉比對 Resource 名稱）
+- 被編排 API 的 Controller 或端點定義（用於交叉比對覆蓋率）
+- Model、Validator 定義（用於驗證斷言完整性）
+
+> 若 Orchestrator 未提供 `sourceCodeContext`（相容模式），則自行讀取 AppHost `Program.cs` 和 Controller 檔案。
+
+#### 2b. 測試檔案（必須讀取最新版本）
+
+以下檔案**必須**使用 `read` 工具讀取最新版本（可能已被 Executor 修改）：
 
 1. 測試專案 `.csproj`（確認 NuGet 套件）
 2. `AspireAppFixture.cs`（Fixture 設定）
@@ -45,12 +54,12 @@ model: ['Claude Sonnet 4.6 (copilot)', 'GPT-5.1-Codex-Max (copilot)']
 4. IntegrationTestBase 基底類別（如有）
 5. DatabaseManager（如有）
 6. 所有 `*Tests.cs` 測試檔案
-7. AppHost `Program.cs`（用於交叉比對 Resource 名稱）
-8. 被編排 API 的 Controller 或端點定義（用於交叉比對覆蓋率）
 
-### Step 3：執行測試確認結果
+### Step 3：確認測試結果
 
-使用 `runCommands` 執行測試，確認測試都能通過：
+如果 Orchestrator 的委派 prompt 中已包含 Executor 的測試執行結果（全數通過），則**跳過重新執行**，直接使用 Executor 的結果進入 Step 4 審查。
+
+如果 Executor 報告有失敗的測試，或未提供測試結果，則自行執行測試確認：
 
 ```powershell
 dotnet test <solution-path> --no-build --verbosity minimal

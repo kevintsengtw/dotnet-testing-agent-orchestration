@@ -139,6 +139,27 @@ Aspire Analyzer **固定輸出單一 Skill**：
 "requiredSkills": ["aspire-testing"]
 ```
 
+### Step 6：收集 sourceCodeContext（前向傳遞用）
+
+> 此步驟的目的是將你在 Step 1-4 中已讀取的原始碼檔案內容，**原封不動地收錄至輸出報告**，供下游 Writer 和 Reviewer 直接使用，避免重複讀取。
+
+將已讀取檔案的**完整內容**收錄至 `sourceCodeContext` 欄位：
+
+| 欄位 | 來源步驟 | 說明 |
+|------|---------|------|
+| `appHostProgramCs` | Step 1 | AppHost `Program.cs` 完整內容 |
+| `appHostCsproj` | Step 1 | AppHost `.csproj` 完整內容 |
+| `apiProgramCs` | Step 3 | 被編排 API 的 `Program.cs` 完整內容 |
+| `apiCsproj` | Step 1.2 | 被編排 API 的 `.csproj` 完整內容 |
+| `controllers[]` | Step 3 | 所有 Controller / Minimal API 端點檔案的完整內容 |
+| `models[]` | Step 3 | 所有 Model、DTO、Request/Response 類別的完整內容 |
+| `dbContext` | Step 3 | DbContext 類別的完整內容（如有） |
+| `validators[]` | Step 3 | 所有 Validator 類別的完整內容（如有） |
+| `testCsproj` | Step 4 | 測試專案 `.csproj` 完整內容 |
+| `existingTestFiles[]` | Step 4 | 既有測試檔案的完整內容（如有） |
+
+**重要**：`content` 欄位必須包含檔案的**完整原始內容**（非摘要），因為 Writer 需要根據確切的型別定義、方法簽章、驗證規則來撰寫測試。
+
 ---
 
 ## 回傳格式
@@ -238,6 +259,26 @@ Aspire Analyzer **固定輸出單一 Skill**：
     "solutionPath": "samples/aspire/Aspire.Samples.slnx",
     "appHostProjectPath": "samples/aspire/src/Aspire.AppHost/Aspire.AppHost.csproj",
     "testProjectPath": "samples/aspire/tests/Aspire.AppHost.Tests/Aspire.AppHost.Tests.csproj"
+  },
+  "sourceCodeContext": {
+    "appHostProgramCs": { "path": "samples/.../AppHost/Program.cs", "content": "完整檔案內容" },
+    "appHostCsproj": { "path": "samples/.../AppHost/AppHost.csproj", "content": "完整檔案內容" },
+    "apiProgramCs": { "path": "samples/.../WebApi/Program.cs", "content": "完整檔案內容" },
+    "apiCsproj": { "path": "samples/.../WebApi/WebApi.csproj", "content": "完整檔案內容" },
+    "controllers": [
+      { "path": "samples/.../Controllers/XxxController.cs", "content": "完整檔案內容" }
+    ],
+    "models": [
+      { "path": "samples/.../Models/Xxx.cs", "content": "完整檔案內容" }
+    ],
+    "dbContext": { "path": "samples/.../Data/XxxDbContext.cs", "content": "完整檔案內容" },
+    "validators": [
+      { "path": "samples/.../Validators/XxxValidator.cs", "content": "完整檔案內容" }
+    ],
+    "testCsproj": { "path": "samples/.../Tests/Tests.csproj", "content": "完整檔案內容" },
+    "existingTestFiles": [
+      { "path": "samples/.../Tests/Infrastructure/XxxFixture.cs", "content": "完整檔案內容" }
+    ]
   }
 }
 ```
@@ -255,3 +296,4 @@ Aspire Analyzer **固定輸出單一 Skill**：
 7. **requiredSkills 固定** — Aspire Analyzer 固定輸出 `["aspire-testing"]`
 8. **服務名稱精確** — `projectReferences[].name` 必須與 AppHost 中 `AddProject("name")` 的名稱參數完全一致，這會影響 `CreateHttpClient("name")` 的正確性
 9. **Aspire 版本記錄** — 從 `.csproj` 中擷取 Aspire 版本，需處理兩種 csproj 格式：**(A) 分離 SDK 格式**（`<Sdk Name="Aspire.AppHost.Sdk" Version="X.Y.Z" />`，適用 Aspire 8.x/9.x）：版本以 `Aspire.Hosting.AppHost` 套件版本為準（當 SDK 版本與套件版本不同時，以套件版本為權威來源，例如 SDK 9.0.0 + 套件 8.2.2 → Aspire 版本為 8.2.2）；**(B) Project SDK 格式**（`<Project Sdk="Aspire.AppHost.Sdk/X.Y.Z">`，適用 Aspire 13.x）：此格式無獨立 `Aspire.Hosting.AppHost` 套件參考，版本從 SDK 屬性取得
+10. **sourceCodeContext 完整性** — 所有在 Step 1-4 中讀取的原始碼檔案必須收錄至 `sourceCodeContext`，供下游 Writer 和 Reviewer 直接使用，避免重複讀取。`content` 欄位必須是完整檔案內容，不可是摘要或節錄
