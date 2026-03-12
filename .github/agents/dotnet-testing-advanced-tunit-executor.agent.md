@@ -134,11 +134,11 @@ TUnit 的輸出格式與 xUnit 不同：
 
 ### Step 4：回報結果
 
-向 Orchestrator 回報完整執行結果：
+向 Orchestrator 回報完整執行結果（使用 Analyzer 提供的實際方案路徑，非 placeholder）：
 
 ```
 📊 TUnit 測試執行結果
-   方案：TUnit.Samples.slnx
+   方案：<Analyzer 提供的 solutionPath>
    建置結果：✅ 成功
    執行方式：dotnet run（TUnit 原生）
    測試結果：✅ 全部通過（12/12）
@@ -151,7 +151,7 @@ TUnit 的輸出格式與 xUnit 不同：
 
 ```
 📊 TUnit 測試執行結果
-   方案：TUnit.Samples.slnx
+   方案：<Analyzer 提供的 solutionPath>
    建置結果：✅ 成功
    執行方式：dotnet run（TUnit 原生）
    測試結果：❌ 部分失敗（10/12 通過，2 失敗）

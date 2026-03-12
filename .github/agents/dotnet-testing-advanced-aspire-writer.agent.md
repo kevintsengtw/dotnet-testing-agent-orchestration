@@ -34,6 +34,26 @@ Writer **固定載入唯一的 Skill**：
 
 **嚴格規則**：載入 Skill 檔案後，必須在後續的撰寫過程中**遵循 Skill 中定義的所有規則與模式**。這是最高優先級指令。
 
+### Step 1.1：使用 Orchestrator 提供的 sourceCodeContext（效率最佳化）
+
+如果 Orchestrator 的委派 prompt 中包含 `sourceCodeContext`（由 Analyzer 提供的原始碼內容），你**必須**優先使用這些內容，而非自行用 `read` 工具重新讀取。
+
+**可直接使用的內容**（無需 `read`）：
+- AppHost `Program.cs` 和 `.csproj`
+- 被編排 API 的 `Program.cs`、`.csproj`
+- Controller / Minimal API 端點檔案
+- Model、DTO、Request/Response 類別
+- DbContext 類別
+- Validator 類別
+- 測試專案 `.csproj`
+- 既有測試檔案
+
+**仍需自行讀取的檔案**：
+- `.github/skills/dotnet-testing-advanced-aspire-testing/SKILL.md`（Step 1 已處理）
+- 不在 `sourceCodeContext` 中的檔案（如 `launchSettings.json`）
+
+> 若 Orchestrator 未提供 `sourceCodeContext`（相容模式），則按照原有流程自行讀取所有必要檔案。
+
 ### Step 1.5：查詢可升級套件版本
 
 在開始建立測試基礎設施之前，你**必須**在終端機執行以下指令，取得測試專案目前的套件升級狀態：

@@ -50,6 +50,7 @@ model: ['Claude Sonnet 4.6 (copilot)', 'Claude Opus 4.6 (copilot)']
 - ❓ 我是否正在嘗試撰寫 C# 程式碼？→ **停止，委派給 TUnit Writer**
 - ❓ 我是否正在嘗試執行 `dotnet build` 或 `dotnet run`？→ **停止，委派給 TUnit Executor**
 - ❓ 我是否已經收到 Analyzer 的分析報告？→ 沒有的話，**先委派 TUnit Analyzer**
+- ❓ 使用者有指定版本變體（Net8/Net10）但沒給 `#file:` 路徑嗎？→ **先用 `search` 找到目標檔案路徑，再委派 Analyzer**
 
 **在收到每個 subagent 的回傳結果之前，你不得採取任何程式碼相關行動。**
 
@@ -65,7 +66,7 @@ model: ['Claude Sonnet 4.6 (copilot)', 'Claude Opus 4.6 (copilot)']
 
 **傳給 Analyzer 的 prompt 必須包含：**
 
-- 被測試目標的檔案路徑（如果使用者提供了的話）
+- 被測試目標的檔案路徑（如果使用者提供的話；若未提供，Orchestrator 須先用 `search` 搜尋）
 - 被測試目標的類別名稱 / 方法名稱
 - 測試專案的路徑（讓 Analyzer 能掃描既有測試基礎設施）
 - 使用者的特殊需求（如果有的話）
@@ -223,6 +224,19 @@ model: ['Claude Sonnet 4.6 (copilot)', 'Claude Opus 4.6 (copilot)']
 ## 多目標支援
 
 當使用者一次指定多個類別或多種測試場景時，執行以下策略：
+
+### Step 0：定位目標檔案（強制執行）
+
+在委派 Analyzer 之前，若使用者**未提供 `#file:` 引用**，必須先用 `search` 工具主動搜尋目標類別：
+
+1. 搜尋每個目標類別名稱（例如 `LoanService`、`ReservationService`）
+2. 若使用者指定了版本變體（如 `Practice.TUnit.Net10.Core`），將搜尋範圍限定在對應目錄：
+   - `Net8` → `samples/practice_tunit/src/Practice.TUnit.Net8.Core/`
+   - `Net9` / 預設 → `samples/practice_tunit/src/Practice.TUnit.Core/`
+   - `Net10` → `samples/practice_tunit/src/Practice.TUnit.Net10.Core/`
+3. 確認每個目標的**完整檔案路徑**後，再進行委派
+
+> ⛔ **不得在找不到目標檔案時嘗試自行撰寫程式碼**。若搜尋失敗，向使用者確認路徑。
 
 ### 多目標偵測
 

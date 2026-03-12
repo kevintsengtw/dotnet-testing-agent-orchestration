@@ -52,6 +52,29 @@ model: ['Claude Sonnet 4.6 (copilot)', 'Claude Opus 4.6 (copilot)']
 
 ---
 
+## 🚀 資訊傳遞最佳化原則
+
+> **核心問題**：四階段串聯流程中，每個 subagent 各自讀取相同的原始碼檔案，導致大量重複的 file I/O 與 token 消耗。
+
+### 解決方案：sourceCodeContext 前向傳遞
+
+Analyzer 的分析報告中包含 `sourceCodeContext` 欄位，內含所有原始碼檔案的完整內容。Orchestrator 在委派後續 subagent 時，**必須將此內容前向傳遞**，讓 Writer 和 Reviewer 無需重複讀取檔案。
+
+| 階段 | 接收內容 | 需要自行讀取的檔案 |
+|------|---------|------------------|
+| Analyzer | — | 全部原始碼（首次讀取，並收錄至 `sourceCodeContext`） |
+| Writer | Analyzer 完整報告（含 `sourceCodeContext`） | 僅 SKILL.md（Analyzer 不負責載入 Skills） |
+| Executor | Writer 產出的檔案路徑 | 僅在建置/測試錯誤時才按需讀取 |
+| Reviewer | Analyzer `sourceCodeContext` + 測試檔案路徑 | 僅測試檔案（可能已被 Executor 修改，需讀取最新版本） |
+
+### Orchestrator 的傳遞職責
+
+- ✅ 將 Analyzer 回傳的 `sourceCodeContext` **完整嵌入** Writer 和 Reviewer 的委派 prompt 中
+- ✅ 在委派 prompt 中明確指示：「以下原始碼已由 Analyzer 提供，請直接使用，無需重新讀取這些檔案」
+- ❌ 不得在委派 prompt 中只放檔案路徑而省略 `sourceCodeContext`（這會導致 subagent 重複讀取）
+
+---
+
 ## 核心工作流程
 
 你必須嚴格遵循以下四階段流程：
@@ -84,18 +107,19 @@ model: ['Claude Sonnet 4.6 (copilot)', 'Claude Opus 4.6 (copilot)']
 
 **傳給 Writer 的 prompt 必須包含：**
 
-1. **完整的分析報告 JSON**（來自 Analyzer，包含 `existingTestInfrastructure` 欄位）
-2. **AppHost `Program.cs` 路徑**
-3. **被編排 API 專案的檔案路徑**（Program.cs、Controller、Models、DbContext）
-4. **測試檔案的預期輸出路徑**（依照現有專案結構推導）
-5. **`requiredSkills: ["aspire-testing"]`**
-6. **`suggestedTestScenarios` 清單**（讓 Writer 直接採用中文測試命名）
-7. **重要提醒：沿用既有基礎設施** — 如果 Analyzer 報告中有 `existingTestInfrastructure`，明確告知 Writer 必須使用這些基礎設施，不得重新建構
-8. **Aspire 專屬提醒**：
+1. **完整的分析報告 JSON**（來自 Analyzer，包含 `existingTestInfrastructure` 和 `sourceCodeContext` 欄位）
+2. **`sourceCodeContext` 中的原始碼內容**（直接嵌入 prompt，並加上前言：「以下原始碼已由 Analyzer 提供，請直接使用，無需重新讀取這些檔案」）
+3. **測試檔案的預期輸出路徑**（依照現有專案結構推導）
+4. **`requiredSkills: ["aspire-testing"]`**
+5. **`suggestedTestScenarios` 清單**（讓 Writer 直接採用中文測試命名）
+6. **重要提醒：沿用既有基礎設施** — 如果 Analyzer 報告中有 `existingTestInfrastructure`，明確告知 Writer 必須使用這些基礎設施，不得重新建構
+7. **Aspire 專屬提醒**：
    - 使用 `DistributedApplicationTestingBuilder.CreateAsync<T>()` 而非 `WebApplicationFactory`
    - 使用 `app.CreateHttpClient("servicename")` 而非 `factory.CreateClient()`
    - 容器由 Aspire 自動管理，不需要程式化啟動/停止容器
    - Resource 名稱必須與 AppHost 中 `AddProject("name")` 的名稱一致
+
+> ⚠️ **效率提醒**：Writer 不應重新 `read` 已在 `sourceCodeContext` 中提供的檔案。Writer 唯一需要自行讀取的是 SKILL.md 和不在 `sourceCodeContext` 中的檔案（如 `launchSettings.json`）。
 
 ### 階段 3：委派執行（Aspire Executor）
 
@@ -103,13 +127,15 @@ model: ['Claude Sonnet 4.6 (copilot)', 'Claude Opus 4.6 (copilot)']
 
 **傳給 Executor 的 prompt 必須包含：**
 
-1. **測試專案路徑**（Writer 回傳的測試檔案位置）
-2. **AppHost 專案路徑**（供 Executor 讀取原始碼以修正錯誤）
-3. **方案路徑**（.slnx 檔案路徑）
+1. **方案路徑**（.slnx 檔案路徑，用於 `dotnet build` 和 `dotnet test`）
+2. **測試專案路徑**（Writer 回傳的測試檔案位置）
+3. **Writer 建立/修改的檔案清單**（讓 Executor 知道範圍，無需自行掃描）
 4. **環境檢查提醒**：
    - Docker Desktop 必須執行中（Aspire 透過 Docker 管理容器）
    - .NET Aspire workload 必須已安裝（`dotnet workload list` 確認）
 5. **超時設定建議**：Aspire 測試需啟動 AppHost + 多個容器，建議超時設定為 **10 分鐘以上**
+
+> ⚠️ **效率提醒**：Executor 的核心職責是建置與執行，不要預先讀取所有測試檔案或原始碼。僅在建置錯誤或測試失敗時，才按需讀取相關檔案進行修正。
 
 ### 階段 4：委派審查（Aspire Reviewer）
 
@@ -117,10 +143,12 @@ model: ['Claude Sonnet 4.6 (copilot)', 'Claude Opus 4.6 (copilot)']
 
 **傳給 Reviewer 的 prompt 必須包含：**
 
-1. **測試檔案路徑**（Executor 已在原檔案上完成修正，Reviewer 直接 `read` 該路徑即可取得最終版本）
-2. **AppHost 專案路徑** + **API 專案的主要檔案路徑**（供 Reviewer 讀取原始碼比對）
-3. **Analyzer 的分析報告**（讓 Reviewer 知道 Resource 定義、端點結構等）
-4. **Executor 的 `dotnet test` 執行結果**（是否全數通過、容器啟動情況）
+1. **測試檔案路徑**（Executor 已在原檔案上完成修正，Reviewer 必須 `read` 這些路徑取得最終版本）
+2. **Analyzer 的 `sourceCodeContext`**（嵌入原始碼內容，並加上前言：「以下原始碼已由 Analyzer 提供，請直接使用作為比對基準，無需重新讀取」）
+3. **Analyzer 的分析報告摘要**（`endpoints`、`validatorInfo`、`suggestedTestScenarios` — 讓 Reviewer 知道端點結構和預期覆蓋率）
+4. **Executor 的 `dotnet test` 執行結果**（是否全數通過、容器啟動情況、修正紀錄）
+
+> ⚠️ **效率提醒**：Reviewer 不應重新 `read` 已在 `sourceCodeContext` 中提供的 AppHost Program.cs、Controller、Models 等原始碼檔案。Reviewer 唯一需要自行讀取的是**測試檔案**（因為可能已被 Executor 修改）和 **SKILL.md**（用於品質基準）。
 
 ---
 
@@ -258,3 +286,4 @@ model: ['Claude Sonnet 4.6 (copilot)', 'Claude Opus 4.6 (copilot)']
 8. **`suggestedTestScenarios` 必須是中文** — Analyzer 產出的建議測試命名必須使用中文三段式格式
 9. **環境檢查不可跳過** — Docker + Aspire workload 兩項環境檢查都必須在 Executor 階段完成
 10. **AppHost 啟動超時保護** — Aspire 測試需啟動多個容器，Executor 必須使用長超時設定（10 分鐘+）
+11. **sourceCodeContext 前向傳遞** — Analyzer 報告中的 `sourceCodeContext` 必須完整嵌入 Writer 和 Reviewer 的委派 prompt，避免 subagent 重複讀取相同的原始碼檔案
