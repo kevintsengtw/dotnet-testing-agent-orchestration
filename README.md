@@ -14,7 +14,6 @@
   - [核心組成](#核心組成)
     - [Agent Orchestrators](#agent-orchestrators)
     - [Agent Skills](#agent-skills)
-    - [Custom Prompts](#custom-prompts)
     - [驗證專案](#驗證專案)
   - [快速開始](#快速開始)
     - [前置需求](#前置需求)
@@ -36,13 +35,13 @@
 dotnet-testing-agent-orchestration/
 ├── .github/
 │   ├── agents/                  # Agent 定義檔（4 Orchestrators + 16 Subagents = 20 個）
-│   ├── prompts/                 # GitHub Copilot Custom Prompts（16 個）
-│   ├── skills/                  # GitHub Copilot Agent Skills（30 個 + 4 個 OpenSpec）
+│   ├── skills/                  # GitHub Copilot Agent Skills（30 個）
 │   └── copilot-instructions.md  # Repository Custom Instructions
 ├── docs/
 │   ├── agent_orchestration/     # Agent Orchestration 說明與操作指南
+│   ├── mcp_local_rag/           # mcp-local-rag 安裝、索引與排查文件
 │   ├── skills/                  # Agent Skills 說明文件
-│   └── prompts/                 # Custom Prompts 說明文件
+│   └── v2_0_0/                  # v2.0.0 發佈、升級與故障排查文件
 ├── samples/                     # 驗證專案（各含 3 種 .NET 版本）
 │   ├── practice/                # 單元測試驗證
 │   ├── practice_integration/    # 整合測試驗證
@@ -85,7 +84,7 @@ flowchart TD
 
 ### Agent Skills
 
-本工作區包含 **dotnet-testing-agent-skills v2.3.0** 的完整技能集合，共 **30 個 Skills**（2 個總覽 + 27 個專業 + 1 個第三方），分為五大階段：
+本工作區包含 **dotnet-testing-agent-skills v2.4.1** 的完整技能集合，共 **30 個 Skills**（2 個總覽 + 27 個專業 + 1 個第三方），分為五大階段：
 
 | 階段           | 內容                                                   | 技能數量 |
 | -------------- | ------------------------------------------------------ | -------- |
@@ -96,24 +95,6 @@ flowchart TD
 | 框架遷移       | xUnit v2→v3 升級、TUnit 新世代框架                     | 3        |
 
 > Skills 來源：[kevintsengtw/dotnet-testing-agent-skills](https://github.com/kevintsengtw/dotnet-testing-agent-skills)
-
-### Custom Prompts
-
-共 **16 個** Custom Prompts，每個 Prompt 預先組合相關 Agent Skills，提供特定場景的測試指導：
-
-| 分類             | Prompts                                                                                          |
-| ---------------- | ------------------------------------------------------------------------------------------------ |
-| 基礎測試         | `dotnet-testing-fundamentals`                                                                    |
-| 斷言與驗證       | `dotnet-testing-assertions`                                                                      |
-| Mock 與依賴隔離  | `dotnet-testing-nsubstitute-mocking`                                                             |
-| 可測試性抽象化   | `dotnet-testing-datetime-testing-timeprovider`、`dotnet-testing-filesystem-testing-abstractions` |
-| 測試資料生成     | `dotnet-testing-test-data-builder`、`dotnet-testing-autofixture-bogus`                           |
-| 測試輸出與覆蓋率 | `dotnet-testing-test-output-logging`、`dotnet-testing-code-coverage-analysis`                    |
-| 特殊場景         | `dotnet-testing-private-internal-testing`、`dotnet-testing-fluentvalidation-testing`             |
-| 整合測試         | `dotnet-testing-advanced-integration`、`dotnet-testing-advanced-testcontainers`                  |
-| Aspire 測試      | `dotnet-testing-advanced-aspire-testing`                                                         |
-| TUnit 測試       | `dotnet-testing-advanced-tunit`                                                                  |
-| 框架遷移         | `dotnet-testing-advanced-xunit-upgrade`                                                          |
 
 ### 驗證專案
 
@@ -228,7 +209,7 @@ git clean -fd samples/
 | ------------------------------------------------------------------------ | ---------------------------------------------------- |
 | [docs/agent_orchestration/README.md](docs/agent_orchestration/README.md) | Agent Orchestration 完整說明（概念、架構、建置方式） |
 | [docs/skills/README.md](docs/skills/README.md)                           | Agent Skills 列表與說明                              |
-| [docs/prompts/README.md](docs/prompts/README.md)                         | Custom Prompts 清單與功能說明                        |
+| [docs/v2_0_0/README.md](docs/v2_0_0/README.md)                           | v2.0.0 發佈、升級與故障排查文件                      |
 | [samples/README.md](samples/README.md)                                   | 驗證專案結構與使用方式                               |
 | [.github/copilot-instructions.md](.github/copilot-instructions.md)       | Repository Custom Instructions                       |
 
@@ -247,7 +228,7 @@ git clean -fd samples/
 
 | 專案                                                                                       | 說明                                       |
 | ------------------------------------------------------------------------------------------ | ------------------------------------------ |
-| [dotnet-testing-agent-skills](https://github.com/kevintsengtw/dotnet-testing-agent-skills) | .NET Testing Agent Skills 原始碼（v2.3.0） |
+| [dotnet-testing-agent-skills](https://github.com/kevintsengtw/dotnet-testing-agent-skills) | .NET Testing Agent Skills 原始碼（v2.4.1） |
 
 ---
 

@@ -3,7 +3,7 @@ name: dotnet-testing-advanced-aspire-reviewer
 description: '審查 .NET Aspire 整合測試的品質，載入品質相關 Skills 驗證命名、斷言、Aspire 測試結構等最佳實踐'
 user-invocable: false
 tools: ['read', 'search', 'search/listDirectory', 'execute/getTerminalOutput','execute/runInTerminal','read/terminalLastCommand','read/terminalSelection']
-model: ['Claude Sonnet 4.6 (copilot)', 'GPT-5.1-Codex-Max (copilot)']
+model: ['GPT-5.3-Codex (copilot)', 'GPT-5.4 (copilot)']
 ---
 
 # .NET Aspire 整合測試審查器
@@ -20,6 +20,15 @@ model: ['Claude Sonnet 4.6 (copilot)', 'GPT-5.1-Codex-Max (copilot)']
 ---
 
 ## 審查流程
+
+### Step 0：讀取 JSON 交接資訊（如果可用）
+
+如果 Orchestrator 在 prompt 中提供了 JSON 交接檔案路徑，使用 `execute/runInTerminal` 讀取：
+
+- 讀取 Analyzer 分析報告：`Get-Content -Path ".orchestrator/{TargetName}/analyzer-result.json" -Raw`
+- 讀取 Executor 執行結果：`Get-Content -Path ".orchestrator/{TargetName}/executor-result.json" -Raw`
+
+以這些 JSON 檔案的內容補充 Orchestrator 傳來的 prompt 資訊，取得更完整的分析背景與執行結果。
 
 ### Step 1：載入 Skills
 
@@ -223,3 +232,4 @@ dotnet test <solution-path> --no-build --verbosity minimal
 7. **覆蓋率以端點為單位** — 以 HTTP 端點 × 情境為單位計算覆蓋率
 8. **公正客觀** — 報告必須反映真實狀況，不誇大也不輕描淡寫
 9. **Resource 名稱交叉比對** — 必須讀取 AppHost `Program.cs` 比對 `CreateHttpClient` 的名稱是否與 `AddProject` 一致
+10. **不得以目標名稱分流** — 不可因 Resource 名稱、專案名稱、歷史案例或 benchmark 目標而調整審查尺度、評級門檻或問題嚴重度；判準必須只依 Skills 與實際測試內容

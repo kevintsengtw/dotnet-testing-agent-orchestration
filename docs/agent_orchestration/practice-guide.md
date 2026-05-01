@@ -12,7 +12,7 @@
 
 | 項目                | 說明                                                   |
 | ------------------- | ------------------------------------------------------ |
-| **VS Code**         | 1.109 以上，已安裝 GitHub Copilot Chat                 |
+| **VS Code**         | 1.118 以上，已安裝 GitHub Copilot Chat                 |
 | **VS Code 設定**    | `chat.customAgentInSubagent.enabled: true`             |
 | **.NET SDK**        | 依據目標版本安裝 .NET 8 / 9 / 10 SDK                   |
 | **Docker Desktop**  | 整合測試與 Aspire 測試需要（單元測試與 TUnit 不需要）  |

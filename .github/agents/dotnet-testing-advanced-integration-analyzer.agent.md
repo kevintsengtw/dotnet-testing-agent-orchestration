@@ -2,8 +2,8 @@
 name: dotnet-testing-advanced-integration-analyzer
 description: '分析 .NET WebAPI 專案的端點結構、資料層依賴、容器需求，產出整合測試分析報告'
 user-invocable: false
-tools: ['read', 'search', 'search/usages', 'search/listDirectory']
-model: Claude Sonnet 4.6 (copilot)
+tools: ['read', 'search', 'search/usages', 'search/listDirectory', 'execute/runInTerminal']
+model: ['GPT-5.3-Codex (copilot)', 'GPT-5.4 (copilot)']
 ---
 
 # .NET 整合測試分析器
@@ -120,13 +120,11 @@ model: Claude Sonnet 4.6 (copilot)
   "pattern": "hardcoded-unconditional",
   "location": "Program.cs:16-17",
   "currentProvider": "InMemory",
-  "registrationCode": "builder.Services.AddDbContext<OrderDbContext>(options => options.UseInMemoryDatabase(\"PracticeIntegrationDb\"))",
+  "registrationCode": "builder.Services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase(\"AppDb\"))",
   "risk": "high",
   "recommendation": "需修改 Program.cs，在 AddDbContext 外層加入 if(!builder.Environment.IsEnvironment(\"Testing\")) 條件判斷，避免 Provider 衝突"
 }
 ```
-
-> ⚠️ **P1-2c 驗證教訓**：在 P1-2c 驗證中，Analyzer 未分析 Program.cs 的 DbContext 註冊模式，導致 Writer 產出的測試碼假設標準 descriptor 移除即可運作。但因 Program.cs 硬編碼了 `UseInMemoryDatabase()`，標準 `SingleOrDefault` descriptor 移除無法完全清除 InMemory Provider 設定，最終 Executor 經過 3 輪修正才透過修改 Program.cs 解決。此步驟的目的是**在上游分析階段就識別此風險**，避免下游反覆修正。
 
 #### Step 3.3：中介軟體管線分析
 
@@ -179,7 +177,7 @@ model: Claude Sonnet 4.6 (copilot)
 
 ```json
 {
-  "projectName": "Practice.Integration.WebApi",
+  "projectName": "MyCompany.WebApi",
   "apiArchitecture": "controller-based",
   "endpointsToTest": [
     {
@@ -222,7 +220,7 @@ model: Claude Sonnet 4.6 (copilot)
     "pattern": "hardcoded-unconditional",
     "location": "Program.cs:16-17",
     "currentProvider": "InMemory",
-    "registrationCode": "builder.Services.AddDbContext<OrderDbContext>(options => options.UseInMemoryDatabase(\"PracticeIntegrationDb\"))",
+    "registrationCode": "builder.Services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase(\"AppDb\"))",
     "risk": "high",
     "recommendation": "需修改 Program.cs，在 AddDbContext 外層加入 if(!builder.Environment.IsEnvironment(\"Testing\")) 條件判斷，避免 Provider 衝突"
   },
@@ -281,9 +279,9 @@ model: Claude Sonnet 4.6 (copilot)
   "projectContext": {
     "targetFramework": "net9.0",
     "testFramework": "xunit",
-    "solutionPath": "practice_integration/Practice.Integration.slnx",
-    "sourceProjectPath": "practice_integration/src/Practice.Integration.WebApi/Practice.Integration.WebApi.csproj",
-    "testProjectPath": "practice_integration/tests/Practice.Integration.WebApi.Tests/Practice.Integration.WebApi.Tests.csproj"
+    "solutionPath": "workspace/MyCompany.Integration.slnx",
+    "sourceProjectPath": "workspace/src/MyCompany.WebApi/MyCompany.WebApi.csproj",
+    "testProjectPath": "workspace/tests/MyCompany.WebApi.Tests/MyCompany.WebApi.Tests.csproj"
   }
 }
 ```
@@ -301,3 +299,13 @@ model: Claude Sonnet 4.6 (copilot)
 7. **介面路徑要正確** — 如果有識別到介面（如 `IValidator<T>`），提供正確的檔案路徑
 8. **requiredSkills 必須精確** — 只列出實際需要的 Skills，不要「以防萬一」全部列上
 9. **DbContext 註冊模式必須分析** — `dbRegistrationAnalysis` 是 Writer 決定 DbContext 置換策略的關鍵依據。當 `pattern` 為 `hardcoded-unconditional` 且使用者要求容器化測試（Provider 不同於原始註冊的 Provider）時，必須標記 `risk: "high"` 並建議修改 Program.cs
+10. **不得以目標名稱分流** — 不可因 Controller 名稱、專案名稱、歷史案例或 benchmark 目標而調整分析深度或輸出判準；分析決策只能依實際專案結構與程式碼內容
+---
+
+## JSON 交接輸出
+
+完成分析後，如果 Orchestrator 在 prompt 中指定了 JSON 輸出路徑（格式：`.orchestrator/{TargetName}/analyzer-result.json`），使用 `execute/runInTerminal` 將分析結果寫入該路徑：
+
+`$json = '{...}'; Set-Content -Path ".orchestrator/{TargetName}/analyzer-result.json" -Value $json -Encoding UTF8`
+
+其中 `{...}` 為上方 JSON 格式的完整分析報告內容。

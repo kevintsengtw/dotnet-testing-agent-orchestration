@@ -2,8 +2,8 @@
 name: dotnet-testing-advanced-integration-writer
 description: '根據 Analyzer 分析結果載入對應的整合測試 Agent Skills，撰寫符合最佳實踐的 .NET WebAPI 整合測試'
 user-invocable: false
-tools: ['read', 'search', 'edit', 'execute/getTerminalOutput','execute/runInTerminal','read/terminalLastCommand','read/terminalSelection']
-model: ['Claude Sonnet 4.6 (copilot)', 'GPT-5.1-Codex-Max (copilot)']
+tools: ['read', 'search', 'edit', 'execute/getTerminalOutput','execute/runInTerminal','read/terminalLastCommand','read/terminalSelection','mcp:dotnet-testing-skills/query_documents']
+model: ['GPT-5.3-Codex (copilot)', 'GPT-5.4 (copilot)']
 ---
 
 # .NET 整合測試撰寫器
@@ -14,25 +14,31 @@ model: ['Claude Sonnet 4.6 (copilot)', 'GPT-5.1-Codex-Max (copilot)']
 
 ## 撰寫流程
 
-### Step 1：載入 Skills
+### Step 0：讀取 JSON 交接資訊（如果可用）
 
-根據 Analyzer 回傳的 `requiredSkills` 清單，使用 `read` 工具載入對應的 SKILL.md 檔案。
+如果 Orchestrator 在 prompt 中提供了 `analyzer-result.json` 的路徑（格式：`.orchestrator/{TargetName}/analyzer-result.json`），使用 `execute/runInTerminal` 讀取該檔案：
 
-#### 必載 Skill
+`Get-Content -Path ".orchestrator/{TargetName}/analyzer-result.json" -Raw`
 
-| Skill | 路徑 |
-|-------|------|
-| `webapi-integration-testing` | `.github/skills/dotnet-testing-advanced-webapi-integration-testing/SKILL.md` |
+若檔案存在，以其完整 JSON 內容作為 Analyzer 分析報告的**首要參考**（比 Orchestrator prompt 中的摘要更完整精確）。
 
-#### 條件載入 Skills
+### Step 1：透過 RAG 索引庫取得技術知識
 
-| Skill | 路徑 | 載入條件 |
-|-------|------|---------|
-| `aspnet-integration-testing` | `.github/skills/dotnet-testing-advanced-aspnet-integration-testing/SKILL.md` | `apiArchitecture` 為 `controller-based` 或 `mixed` |
-| `testcontainers-database` | `.github/skills/dotnet-testing-advanced-testcontainers-database/SKILL.md` | `containerRequirements` 含 SQL Server 或 PostgreSQL |
-| `testcontainers-nosql` | `.github/skills/dotnet-testing-advanced-testcontainers-nosql/SKILL.md` | `containerRequirements` 含 MongoDB 或 Redis |
+根據 Analyzer 回傳的 `requiredSkills` 清單，使用 `mcp:dotnet-testing-skills/query_documents` 工具批次查詢對應的技術知識。
 
-**嚴格規則**：載入 Skill 檔案後，必須在後續的撰寫過程中**遵循 Skill 中定義的所有規則與模式**。這是最高優先級指令。
+**必載查詢（每次都執行）**：
+- Query: `"WebApplicationFactory ASP.NET Core integration test TestServer HttpClient endpoint WebApiFactory IExceptionHandler ProblemDetails Flurl Respawn AwesomeAssertions HTTP Be200Ok Be201Created Be400BadRequest Be404NotFound ValidationProblemDetails"`
+- Limit: 10
+
+**條件查詢（根據 `requiredSkills` 實際內容執行）**：
+
+| 條件 | Query | Limit |
+|------|-------|-------|
+| 含 `aspnet-integration-testing` 或 `apiArchitecture` 為 `controller-based` | `"ASP.NET Core controller-based WebApplicationFactory ConfigureWebHost ConfigureServices descriptor remove middleware authentication authorization"` | 6 |
+| 含 `testcontainers-database` | `"Testcontainers MsSqlContainer PostgreSqlContainer GetConnectionString IAsyncLifetime CollectionFixture EF Core database integration EnsureCreatedAsync"` | 8 |
+| 含 `testcontainers-nosql` | `"Testcontainers MongoDB Redis MongoDbContainer RedisContainer IMongoDatabase StackExchange.Redis BSON IConnectionMultiplexer nosql"` | 6 |
+
+**查詢完成後，以查詢結果作為技術知識來源。嚴格規則**：必須在後續的撰寫過程中**遵循查詢結果中定義的所有規則與模式**。這是最高優先級指令。
 
 ### Step 1.5：分析 DbContext 註冊模式
 
@@ -46,20 +52,20 @@ model: ['Claude Sonnet 4.6 (copilot)', 'GPT-5.1-Codex-Max (copilot)']
 
 #### 策略 A 詳細步驟（hardcoded-unconditional）
 
-**⚠️ 此為 P1-2c 驗證發現的關鍵修正**：當 Program.cs 無條件硬編碼 DB Provider 時，標準的 `SingleOrDefault` descriptor 移除**無法完全清除**原有的 Provider 設定，會導致 `Services for database providers 'X', 'Y' have been registered` 錯誤。
+**⚠️ 關鍵修正**：當 Program.cs 無條件硬編碼 DB Provider 時，標準的 `SingleOrDefault` descriptor 移除**無法完全清除**原有的 Provider 設定，會導致 `Services for database providers 'X', 'Y' have been registered` 錯誤。
 
 1. **修改 Program.cs**：在 `AddDbContext<T>()` 呼叫外層加入環境條件判斷
 
 ```csharp
 // ✅ 修改前（hardcoded-unconditional）
-builder.Services.AddDbContext<OrderDbContext>(options =>
-    options.UseInMemoryDatabase("PracticeIntegrationDb"));
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseInMemoryDatabase("AppDb"));
 
 // ✅ 修改後（conditional）
 if (!builder.Environment.IsEnvironment("Testing"))
 {
-    builder.Services.AddDbContext<OrderDbContext>(options =>
-        options.UseInMemoryDatabase("PracticeIntegrationDb"));
+    builder.Services.AddDbContext<AppDbContext>(options =>
+        options.UseInMemoryDatabase("AppDb"));
 }
 ```
 
@@ -71,7 +77,7 @@ protected override void ConfigureWebHost(IWebHostBuilder builder)
     builder.ConfigureServices(services =>
     {
         // 不需要移除 descriptor — Program.cs 在 Testing 環境下不註冊 DbContext
-        services.AddDbContext<OrderDbContext>(options =>
+        services.AddDbContext<AppDbContext>(options =>
         {
             options.UseSqlServer(ConnectionString);
         });
@@ -81,7 +87,7 @@ protected override void ConfigureWebHost(IWebHostBuilder builder)
 }
 ```
 
-> ⚠️ **P1-2c 驗證教訓**：在 P1-2c 驗證中，Writer 使用標準 descriptor 移除模式，但 Executor 嘗試移除 `DbContextOptions<T>`、`DbContext`、`DbContextOptions` 三個 descriptor 共 3 輪修正仍失敗，最終才改為修改 Program.cs。此策略直接在 Writer 階段解決，避免 Executor 反覆修正。
+> ⚠️ 若 Program.cs 在 Testing 環境仍註冊原始 Provider，單靠 descriptor 移除可能不足。應優先回到策略 A，先將 Program.cs 改為環境條件註冊，再由 Factory 在 Testing 環境註冊測試專用 Provider。
 
 ### Step 1.8：查詢可升級套件版本
 
@@ -381,6 +387,10 @@ Controllers/{Controller}Tests.cs
 5. tests/.../Controllers/OrdersControllerTests.cs
 ```
 
+**JSON 交接輸出**：如果 Orchestrator 在 prompt 中指定了 `writer-result.json` 的輸出路徑（格式：`.orchestrator/{TargetName}/writer-result.json`），完成測試撰寫後用 `execute/runInTerminal` 記錄測試檔案路徑：
+
+`Add-Content -Path ".orchestrator/{TargetName}/writer-result.json" -Value "{test-file-path}" -Encoding UTF8`
+
 ---
 
 ## 撰寫規則（10 條）
@@ -549,7 +559,7 @@ response.Should().Be409Conflict()
     });
 ```
 
-#### 8a. 複合欄位驗證錯誤（P1-3 驗證強化）
+#### 8a. 複合欄位驗證錯誤
 
 當測試**多個欄位同時驗證失敗**的情境時，不僅要驗證 `Errors` 字典的 **key 存在性**，還必須驗證每個欄位的**錯誤訊息內容**：
 
@@ -573,7 +583,7 @@ response.Should().Be400BadRequest()
     });
 ```
 
-#### 8b. 邊界 Happy Path 回應體驗證（P1-3 驗證強化）
+#### 8b. 邊界 Happy Path 回應體驗證
 
 當測試 **邊界值 Happy Path**（例如欄位值剛好在最大長度限制內）時，除了驗證 HTTP `201 Created` 狀態碼外，還**必須**使用 `.And.Satisfy<T>()` 驗證回應體中的資料正確性：
 
@@ -617,7 +627,7 @@ response.Should().Be201Created();
 2. 為每個共用 Validator 的端點建立**等量的驗證測試**
 3. 如果 Create 測試了「名稱為空」、「Email 格式錯誤」等 N 條規則，Update 也必須測試相同的 N 條規則
 
-#### 11a. 條件驗證規則的對稱處理（P1-3 驗證強化）
+#### 11a. 條件驗證規則的對稱處理
 
 當 Validator 包含 **條件驗證規則**（如 `When(x => !string.IsNullOrEmpty(x.Notes), ...)`）時，需特別注意邊界情境的對稱性：
 
@@ -652,3 +662,4 @@ response.Should().Be201Created();
 8. **遵守 Orchestrator 的交辦 scope** — 只撰寫被要求的測試範圍，不超出委派
 9. **對稱驗證覆蓋** — 共用相同驗證規則的端點必須有對等的驗證測試數量
 10. **嚴格遵循 SKILL.md 程式碼模式** — `ConfigureServices`（非 `ConfigureTestServices`）、`SingleOrDefault` descriptor 移除、直接初始化 Container、`InitializeAsync` 內部 `EnsureCreatedAsync`、IntegrationTestBase 基底類別、`Fixtures/` + `TestBase/` + `Controllers/` 目錄結構。任何 SKILL.md 中未出現的模式均不得使用
+11. **不得以目標名稱分流** — 不可因 Controller 名稱、專案名稱、歷史案例或 benchmark 目標而改變測試撰寫策略、覆蓋門檻或規則判準；所有決策必須只依 Analyzer 結構化輸入與 Skills 規範

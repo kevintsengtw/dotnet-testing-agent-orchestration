@@ -31,7 +31,7 @@ git clean -fd samples/practice_tunit/tests/
 
 | 項目             | 說明                                       |
 | ---------------- | ------------------------------------------ |
-| **VS Code**      | 1.109 以上，已安裝 GitHub Copilot Chat     |
+| **VS Code**      | 1.118 以上，已安裝 GitHub Copilot Chat     |
 | **VS Code 設定** | `chat.customAgentInSubagent.enabled: true` |
 | **.NET SDK**     | .NET 9.0 SDK                               |
 
