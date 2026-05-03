@@ -28,7 +28,7 @@
 
 檢查指令：
 
-```powershell
+```bash
 node --version
 npm --version
 ```
@@ -39,13 +39,13 @@ npm --version
 
 ### 一般環境
 
-```powershell
+```bash
 npm install -g mcp-local-rag
 ```
 
 ### 企業 SSL 受管控環境
 
-```powershell
+```bash
 npm config set strict-ssl false
 npm install -g mcp-local-rag
 npm config set strict-ssl true
@@ -55,7 +55,7 @@ npm config set strict-ssl true
 
 ### 驗證安裝
 
-```powershell
+```bash
 npm list -g mcp-local-rag
 npx --prefer-offline mcp-local-rag --help
 ```

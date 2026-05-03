@@ -11,7 +11,7 @@
 
 ### 排查：確認安裝狀態
 
-```powershell
+```bash
 node --version
 npm --version
 npm list -g mcp-local-rag
@@ -20,7 +20,7 @@ npx --prefer-offline mcp-local-rag --help
 
 ### 處理：重新安裝 CLI
 
-```powershell
+```bash
 npm install -g mcp-local-rag
 ```
 
@@ -83,7 +83,7 @@ python ./docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py --mode rebuild
 
 ### 排查：確認索引狀態與查詢字串
 
-```powershell
+```bash
 mcp-local-rag --db-path .mcp/dotnet-testing-skills status
 mcp-local-rag --db-path .mcp/dotnet-testing-skills query "NSubstitute mock interface Returns Received" --limit 3
 ```

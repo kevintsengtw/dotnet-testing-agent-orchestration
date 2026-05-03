@@ -47,10 +47,22 @@
 
 ## 快速開始
 
+**Windows（PowerShell）**
+
 ```powershell
 npm install -g mcp-local-rag
 .\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills.ps1
 .\docs\mcp_local_rag\scripts\mcp-local-rag-verify-skills-index.ps1
 ```
+
+**macOS / Linux**
+
+```bash
+npm install -g mcp-local-rag
+python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py
+python docs/mcp_local_rag/scripts/mcp-local-rag-verify-skills-index.py
+```
+
+> 若環境只有 `python3`，請將上述命令中的 `python` 替換為 `python3`。
 
 若你是從 v1.0.0 升級，先讀 [../v2_0_0/V1_TO_V2_MIGRATION_GUIDE.md](../v2_0_0/V1_TO_V2_MIGRATION_GUIDE.md)，再回到本目錄完成安裝與驗證。
