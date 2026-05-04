@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 """
-將 dotnet-test* SKILL.md 建立索引至 mcp-local-rag 向量資料庫
+將 dotnet-testing-agent-skills 的 SKILL 內容建立索引至 mcp-local-rag 向量資料庫
 
 初次設定或 skills 有更新時執行。
-只索引 dotnet-test 開頭的 skill 目錄，排除 autoresearch、skill-creator-advanced 等無關目錄。
+索引來源為 dotnet-testing-agent-skills 倉庫（需另行 clone），以 --skills-path 參數指定其
+.github/skills 目錄路徑。執行前會先驗證來源路徑是否包含 dotnet-testing* 技能目錄。
 索引位置：.mcp/dotnet-testing-skills（由 .vscode/mcp.json 的 DB_PATH 指定）
 
 用法：
-    python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py
-    python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py --mode rebuild
-    python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py --mode update
+    python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py --skills-path /path/to/dotnet-testing-agent-skills/.github/skills
+    python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py --skills-path /path/to/dotnet-testing-agent-skills/.github/skills --mode rebuild
+    python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py --skills-path /path/to/dotnet-testing-agent-skills/.github/skills --mode update
 """
 
 import argparse
@@ -25,9 +26,20 @@ sys.stderr.reconfigure(encoding="utf-8")
 
 MCP_CMD = "mcp-local-rag.cmd" if sys.platform == "win32" else "mcp-local-rag"
 
+GREEN = "\033[92m"
+RED = "\033[91m"
+YELLOW = "\033[93m"
+RESET = "\033[0m"
+
 
 def main():
     parser = argparse.ArgumentParser(description="建立 dotnet-testing-skills RAG 索引")
+    parser.add_argument(
+        "--skills-path",
+        required=True,
+        help="dotnet-testing-agent-skills 倉庫的 .github/skills 目錄路徑（必填）。"
+             "範例：/path/to/dotnet-testing-agent-skills/.github/skills",
+    )
     parser.add_argument(
         "--mode",
         choices=["update", "rebuild"],
@@ -38,12 +50,33 @@ def main():
 
     script_dir = Path(__file__).resolve().parent
     repo_root = script_dir.parent.parent.parent
-    skills_dir = repo_root / ".github" / "skills"
+    skills_dir = Path(args.skills_path)
     db_path = repo_root / ".mcp" / "dotnet-testing-skills"
 
-    print(f"Skills 目錄：{skills_dir}")
+    print(f"Skills 來源：{skills_dir}")
     print(f"DB 路徑：{db_path}")
     print(f"模式：{args.mode}")
+    print()
+
+    # 前置驗證：確認來源目錄存在且包含 dotnet-testing* 技能目錄
+    if not skills_dir.exists():
+        print(f"{RED}❌ 找不到指定的 Skills 來源目錄：{skills_dir}{RESET}")
+        print(f"{YELLOW}   請確認 dotnet-testing-agent-skills 已正確 clone，且 --skills-path 路徑正確。{RESET}")
+        print(f"{YELLOW}   倉庫來源：https://github.com/kevintsengtw/dotnet-testing-agent-skills{RESET}")
+        sys.exit(1)
+
+    testing_skills = [
+        d for d in skills_dir.iterdir()
+        if d.is_dir() and d.name.startswith("dotnet-testing")
+    ]
+
+    if not testing_skills:
+        print(f"{RED}❌ 在指定路徑找不到 dotnet-testing* 技能目錄：{skills_dir}{RESET}")
+        print(f"{YELLOW}   請確認 --skills-path 指向 dotnet-testing-agent-skills 的 .github/skills 目錄。{RESET}")
+        print(f"{YELLOW}   倉庫來源：https://github.com/kevintsengtw/dotnet-testing-agent-skills{RESET}")
+        sys.exit(1)
+
+    print(f"{GREEN}✓ 前置驗證通過：找到 {len(testing_skills)} 個 dotnet-testing* 技能目錄{RESET}")
     print()
 
     if args.mode == "rebuild":
@@ -64,6 +97,7 @@ def main():
         if d.is_dir() and d.name.startswith("dotnet-test")
     )
 
+    print()
     print(f"目標 skill 目錄（{len(target_skills)} 個）：")
     for skill in target_skills:
         print(f"  {skill.name}")

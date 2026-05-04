@@ -10,7 +10,7 @@
 
 1. [MCP_LOCAL_RAG_SETUP_GUIDE.md](MCP_LOCAL_RAG_SETUP_GUIDE.md)
 
-   首次安裝或重建環境時先讀這份，內容涵蓋 Node.js、CLI 安裝、索引建立、驗證與維護。
+   首次安裝或重建環境時先讀這份，內容涵蓋前置需求（含取得 dotnet-testing-agent-skills）、Node.js、CLI 安裝、索引建立、驗證與維護。
 
 2. [MCP_LOCAL_RAG_DESIGN.md](MCP_LOCAL_RAG_DESIGN.md)
 
@@ -18,7 +18,7 @@
 
 3. [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
 
-   處理 CLI、索引、embedding model、query 品質與 `.vscode/mcp.json` 相關問題。
+   處理 CLI、dotnet-testing* 技能找不到、索引、embedding model、query 品質與 `.vscode/mcp.json` 相關問題。
 
 4. [scripts/](scripts/)
 
@@ -47,19 +47,43 @@
 
 ## 快速開始
 
-**Windows（PowerShell）**
+### 步驟一：clone dotnet-testing-agent-skills（技能來源）
 
-```powershell
-npm install -g mcp-local-rag
-.\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills.ps1
-.\docs\mcp_local_rag\scripts\mcp-local-rag-verify-skills-index.ps1
+```bash
+git clone https://github.com/kevintsengtw/dotnet-testing-agent-skills.git
 ```
 
-**macOS / Linux**
+### 步驟二：安裝 mcp-local-rag
 
 ```bash
 npm install -g mcp-local-rag
-python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py
+```
+
+### 步驟三：建立索引
+
+Windows（PowerShell）：
+
+```powershell
+.\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills.ps1 -SkillsPath C:\projects\dotnet-testing-agent-skills\.github\skills
+```
+
+macOS / Linux：
+
+```bash
+python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py --skills-path /path/to/dotnet-testing-agent-skills/.github/skills
+```
+
+### 步驟四：驗證索引
+
+Windows（PowerShell）：
+
+```powershell
+.\docs\mcp_local_rag\scripts\mcp-local-rag-verify-skills-index.ps1
+```
+
+macOS / Linux：
+
+```bash
 python docs/mcp_local_rag/scripts/mcp-local-rag-verify-skills-index.py
 ```
 

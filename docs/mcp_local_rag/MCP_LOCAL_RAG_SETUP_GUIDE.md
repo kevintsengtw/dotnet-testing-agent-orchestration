@@ -18,13 +18,14 @@
 
 ## 2. 前置需求
 
-| 項目                | 要求                           |
-| ------------------- | ------------------------------ |
-| Node.js             | 18 以上                        |
-| npm / npx           | 可正常執行                     |
-| Git                 | 可使用 repo 內腳本與更新工作流 |
-| VS Code             | 1.118 以上                     |
-| GitHub Copilot Chat | 已安裝                         |
+| 項目                         | 要求                                                                                     |
+| ---------------------------- | ---------------------------------------------------------------------------------------- |
+| Node.js                      | 18 以上                                                                                  |
+| npm / npx                    | 可正常執行                                                                               |
+| Git                          | 可使用 repo 內腳本與更新工作流                                                           |
+| VS Code                      | 1.118 以上                                                                               |
+| GitHub Copilot Chat          | 已安裝                                                                                   |
+| dotnet-testing-agent-skills  | 已 clone 至本機（技能索引來源，見下方說明）                                              |
 
 檢查指令：
 
@@ -35,7 +36,25 @@ npm --version
 
 ---
 
-## 3. 安裝 mcp-local-rag
+## 3. 取得 dotnet-testing-agent-skills
+
+`dotnet-testing-agent-skills` 是建立索引庫的**技能來源**，需要先 clone 至本機：
+
+```bash
+git clone https://github.com/kevintsengtw/dotnet-testing-agent-skills.git
+```
+
+請記下 clone 後的本機路徑，後續建立索引時需要以 `-SkillsPath`（PowerShell）或 `--skills-path`（Python）參數指定其 `.github/skills` 目錄：
+
+| 平台    | 路徑範例                                                                        |
+| ------- | ------------------------------------------------------------------------------- |
+| Windows | `C:\projects\dotnet-testing-agent-skills\.github\skills`                        |
+| macOS   | `/Users/yourname/projects/dotnet-testing-agent-skills/.github/skills`           |
+| Linux   | `/home/yourname/projects/dotnet-testing-agent-skills/.github/skills`            |
+
+---
+
+## 4. 安裝 mcp-local-rag
 
 ### 一般環境
 
@@ -62,9 +81,9 @@ npx --prefer-offline mcp-local-rag --help
 
 ---
 
-## 4. MCP 設定
+## 5. MCP 設定
 
-建議在 repo 根目錄的 `.vscode/mcp.json` 採用以下設定：
+建議在 repo 根目錄的 `.vscode/mcp.json` 採用以下設定，並將 `BASE_DIR` 替換為你本機的 `dotnet-testing-agent-skills` 路徑：
 
 ```json
 {
@@ -73,7 +92,7 @@ npx --prefer-offline mcp-local-rag --help
       "command": "npx",
       "args": ["-y", "mcp-local-rag"],
       "env": {
-        "BASE_DIR": "${workspaceFolder}/.github/skills",
+        "BASE_DIR": "/path/to/dotnet-testing-agent-skills/.github/skills",
         "DB_PATH": "${workspaceFolder}/.mcp/dotnet-testing-skills",
         "CACHE_DIR": "${workspaceFolder}/.mcp/cache",
         "RAG_HYBRID_WEIGHT": "0.7",
@@ -84,47 +103,50 @@ npx --prefer-offline mcp-local-rag --help
 }
 ```
 
+> `BASE_DIR` 需指向本機 `dotnet-testing-agent-skills` 的 `.github/skills` 目錄，使 MCP server 能正確解析技能檔案路徑。`DB_PATH` 與 `CACHE_DIR` 使用 `${workspaceFolder}` 指向本 repo。
+
 這代表 repo 內應準備的相關資產為：
 
-- `.github/skills/` 作為索引來源
 - `.mcp/dotnet-testing-skills/` 作為索引資料庫
 - `.mcp/cache/` 作為 embedding model 快取
 
 ---
 
-## 5. 建立 Skills 索引庫
+## 6. 建立 Skills 索引庫
 
 ### Windows 首選：PowerShell 腳本
 
 ```powershell
-.\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills.ps1
+.\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills.ps1 -SkillsPath C:\projects\dotnet-testing-agent-skills\.github\skills
 ```
 
 完整重建：
 
 ```powershell
-.\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills.ps1 -Mode rebuild
+.\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills.ps1 -SkillsPath C:\projects\dotnet-testing-agent-skills\.github\skills -Mode rebuild
 ```
 
 ### 跨平台：Python 腳本
 
 ```bash
-python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py
-python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py --mode rebuild
+python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py --skills-path /path/to/dotnet-testing-agent-skills/.github/skills
+python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py --skills-path /path/to/dotnet-testing-agent-skills/.github/skills --mode rebuild
 ```
+
+腳本在正式建立索引前會執行前置驗證，確認指定路徑包含 `dotnet-testing*` 技能目錄。若驗證失敗，腳本會顯示錯誤訊息並中止，請依提示確認 `dotnet-testing-agent-skills` 已正確 clone 且路徑正確。
 
 ### 何時用 `update`，何時用 `rebuild`
 
-| 情境                    | 建議模式             |
-| ----------------------- | -------------------- |
-| 單一或少量 skill 有修改 | `update`             |
-| 新增新的 skill          | `update`，之後做驗證 |
-| 大量同步上游 skills     | `rebuild`            |
-| 索引狀態異常或結果漂移  | `rebuild`            |
+| 情境                                 | 建議模式             |
+| ------------------------------------ | -------------------- |
+| 單一或少量 skill 有修改              | `update`             |
+| 新增新的 skill                       | `update`，之後做驗證 |
+| 同步上游 dotnet-testing-agent-skills | `rebuild`            |
+| 索引狀態異常或結果漂移               | `rebuild`            |
 
 ---
 
-## 6. 驗證索引庫
+## 7. 驗證索引庫
 
 ### PowerShell
 
@@ -154,7 +176,7 @@ mcp-local-rag --db-path .mcp/dotnet-testing-skills query "NSubstitute mock inter
 
 ---
 
-## 7. 在 workflow 中的實際角色
+## 8. 在 workflow 中的實際角色
 
 ### Writer
 

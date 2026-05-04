@@ -187,7 +187,7 @@ mcp-local-rag 初次啟動會從 HuggingFace 下載 embedding model（`all-MiniL
       "command": "npx",
       "args": ["-y", "mcp-local-rag"],
       "env": {
-        "BASE_DIR": "${workspaceFolder}/.github/skills",
+        "BASE_DIR": "/path/to/dotnet-testing-agent-skills/.github/skills",
         "DB_PATH": "${workspaceFolder}/.mcp/dotnet-testing-skills",
         "CACHE_DIR": "${workspaceFolder}/.mcp/cache",
         "RAG_HYBRID_WEIGHT": "0.7",
@@ -197,6 +197,8 @@ mcp-local-rag 初次啟動會從 HuggingFace 下載 embedding model（`all-MiniL
   }
 }
 ```
+
+> `BASE_DIR` 需替換為本機 `dotnet-testing-agent-skills` 的 `.github/skills` 實際路徑，因為技能索引來源已統一由外部倉庫提供。完整安裝與設定步驟參見 [../mcp_local_rag/MCP_LOCAL_RAG_SETUP_GUIDE.md](../mcp_local_rag/MCP_LOCAL_RAG_SETUP_GUIDE.md)。
 
 ### 搜尋調校（技術文件建議值）
 

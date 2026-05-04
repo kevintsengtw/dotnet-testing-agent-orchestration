@@ -69,7 +69,7 @@ def main():
             print(f"{RED}❌ DB 不完整，中止驗證。{RESET}")
             sys.exit(1)
     else:
-        write_result("DB 存在性", False, "目錄不存在，請先執行 docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py")
+        write_result("DB 存在性", False, "目錄不存在，請先執行 docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py --skills-path <skills 來源路徑>")
         print()
         print(f"{RED}❌ DB 不存在，中止驗證。{RESET}")
         sys.exit(1)
@@ -182,7 +182,7 @@ def main():
         print(f"{GREEN}✅ 所有驗證通過（{passed} / {passed + failed}）{RESET}")
     else:
         print(f"{RED}❌ 驗證未通過（通過 {passed}，失敗 {failed}）{RESET}")
-        print(f"{YELLOW}   → 若需重建索引請執行：python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py --mode rebuild{RESET}")
+        print(f"{YELLOW}   → 若需重建索引請執行：python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py --skills-path <skills 來源路徑> --mode rebuild{RESET}")
     print()
 
 

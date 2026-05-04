@@ -39,7 +39,7 @@ if ($dbExists) {
     $detail = if ($chunksExist) { "chunks.lance 存在" } else { "目錄存在但 chunks.lance 缺失" }
     $ok = $chunksExist
 } else {
-    $detail = "目錄不存在，請先執行 .\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills.ps1 -Mode rebuild"
+    $detail = "目錄不存在，請先執行 .\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills.ps1 -SkillsPath <skills 來源路徑> -Mode rebuild"
     $ok = $false
 }
 Write-Result "DB 存在性" $ok $detail
@@ -156,6 +156,6 @@ if ($fail -eq 0) {
     Write-Host "✅ 所有驗證通過（$pass / $($pass + $fail)）" -ForegroundColor Green
 } else {
     Write-Host "❌ 驗證未通過（通過 $pass，失敗 $fail）" -ForegroundColor Red
-    Write-Host "   → 若需重建索引請執行：.\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills.ps1 -Mode rebuild" -ForegroundColor Yellow
+    Write-Host "   → 若需重建索引請執行：.\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills.ps1 -SkillsPath <skills 來源路徑> -Mode rebuild" -ForegroundColor Yellow
 }
 Write-Host ""

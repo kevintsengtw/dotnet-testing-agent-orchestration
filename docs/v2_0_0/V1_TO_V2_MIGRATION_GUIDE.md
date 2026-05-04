@@ -18,28 +18,35 @@ v2.0.0 的差異摘要參見 [RELEASE_OVERVIEW.md](RELEASE_OVERVIEW.md)。
 
 ## 2. 升級前檢查
 
-| 項目                | 要求                      | 說明                                     |
-| ------------------- | ------------------------- | ---------------------------------------- |
-| VS Code             | 1.118 以上                | 需支援 Custom Agents / Subagents         |
-| GitHub Copilot Chat | 已安裝                    | 為 workflow 的執行環境                   |
-| Node.js             | 18 以上                   | `mcp-local-rag` 必要前置                 |
-| .NET SDK            | 8 / 9 / 10                | 依 sample 與驗證情境而定                 |
-| Docker Desktop      | Integration / Aspire 適用 | 容器化測試情境適用                       |
-| Aspire workload     | Aspire 適用               | 以 `dotnet workload install aspire` 安裝 |
+| 項目                        | 要求                      | 說明                                                                  |
+| --------------------------- | ------------------------- | --------------------------------------------------------------------- |
+| VS Code                     | 1.118 以上                | 需支援 Custom Agents / Subagents                                      |
+| GitHub Copilot Chat         | 已安裝                    | 為 workflow 的執行環境                                                |
+| Node.js                     | 18 以上                   | `mcp-local-rag` 必要前置                                              |
+| dotnet-testing-agent-skills | 已 clone 至本機           | mcp-local-rag 的技能索引來源，clone 自 dotnet-testing-agent-skills    |
+| .NET SDK                    | 8 / 9 / 10                | 依 sample 與驗證情境而定                                              |
+| Docker Desktop              | Integration / Aspire 適用 | 容器化測試情境適用                                                    |
+| Aspire workload             | Aspire 適用               | 以 `dotnet workload install aspire` 安裝                              |
 
 ---
 
 ## 3. 必要調整項目
 
-### 3.1 安裝並設定 `mcp-local-rag`
+### 3.1 取得 dotnet-testing-agent-skills 並安裝 `mcp-local-rag`
 
-`mcp-local-rag` 為 v2.0.0 的必要前置條件。升級至 v2.0.0 前，應先完成安裝、技能索引建立與驗證。
+`dotnet-testing-agent-skills` 是 mcp-local-rag 索引庫的技能來源，需先 clone 至本機：
+
+```bash
+git clone https://github.com/kevintsengtw/dotnet-testing-agent-skills.git
+```
+
+clone 完成後，再安裝 `mcp-local-rag`、建立索引並完成驗證。
 
 相關步驟與腳本參見 [../mcp_local_rag/README.md](../mcp_local_rag/README.md)。
 
 ### 3.2 確認 `.vscode/mcp.json` 設定
 
-目前 repo 內採用的 MCP 標準設定如下：
+目前 repo 內採用的 MCP 標準設定如下，請將 `BASE_DIR` 替換為本機 `dotnet-testing-agent-skills` 的實際路徑：
 
 ```json
 {
@@ -48,7 +55,7 @@ v2.0.0 的差異摘要參見 [RELEASE_OVERVIEW.md](RELEASE_OVERVIEW.md)。
       "command": "npx",
       "args": ["-y", "mcp-local-rag"],
       "env": {
-        "BASE_DIR": "${workspaceFolder}/.github/skills",
+        "BASE_DIR": "/path/to/dotnet-testing-agent-skills/.github/skills",
         "DB_PATH": "${workspaceFolder}/.mcp/dotnet-testing-skills",
         "CACHE_DIR": "${workspaceFolder}/.mcp/cache",
         "RAG_HYBRID_WEIGHT": "0.7",
@@ -58,6 +65,8 @@ v2.0.0 的差異摘要參見 [RELEASE_OVERVIEW.md](RELEASE_OVERVIEW.md)。
   }
 }
 ```
+
+> `BASE_DIR` 需指向本機 `dotnet-testing-agent-skills` 的 `.github/skills` 目錄。`DB_PATH` 與 `CACHE_DIR` 使用 `${workspaceFolder}` 指向本 repo。
 
 若既有設定仍沿用 v1.0.0 時期的路徑或假設，應先完成對齊。
 
@@ -95,8 +104,9 @@ v2.0.0 的 workflow 輸出除測試檔案外，亦包含：
 
 ## 5. 升級後確認清單
 
+- [ ] `dotnet-testing-agent-skills` 已 clone 至本機
 - [ ] `mcp-local-rag` 已安裝並完成索引驗證
-- [ ] `.vscode/mcp.json` 已與目前 repo 的標準設定對齊
+- [ ] `.vscode/mcp.json` 已建立，`BASE_DIR` 已指向本機 `dotnet-testing-agent-skills` 路徑
 - [ ] 已完成一次單一目標最小驗證
 - [ ] `.orchestrator/{TargetName}/` JSON 檔案已正常產生
 - [ ] 對應 orchestrator 的 timing log 已正常產生
