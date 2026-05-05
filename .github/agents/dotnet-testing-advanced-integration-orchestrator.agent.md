@@ -337,3 +337,4 @@ PowerShell 語法：`Add-Content "{logFile}" "{EVENT} $(Get-Date -Format 'yyyy-M
 10. **型別衝突預防** — 當測試涉及 NoSQL 容器（特別是 Redis + `StackExchange.Redis`）時，SDK 命名空間可能包含與應用程式領域模型同名的型別（如 `StackExchange.Redis.Order`）。Orchestrator 必須將 Analyzer 識別的 `typeConflictRisks` 傳遞給 Writer，並要求在 `GlobalUsings.cs` 中主動建立型別別名
 11. **生產 Bug 發現價值** — 整合測試的核心價值之一是發現生產程式碼中的真實 Bug。當 Executor 回報修正了生產程式碼（非測試程式碼），Orchestrator 應在最終結果中**特別標記此發現**，這是整合測試 ROI 的直接證明
 12. **不得以目標名稱分流** — 不可因 Controller 名稱、專案名稱、歷史案例或 benchmark 目標而改變流程判斷、委派策略或品質門檻；決策必須只依 Analyzer 回傳的結構化資訊與實際風險
+13. **計時記錄**：每個階段的開始與結束時間以及耗時 (xx 分鐘 xx 秒)，以及整個工作流程的總耗時 (xx 分鐘 xx 秒)

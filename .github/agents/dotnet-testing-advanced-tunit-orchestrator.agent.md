@@ -303,3 +303,4 @@ PowerShell 語法：`Add-Content "{logFile}" "{EVENT} $(Get-Date -Format 'yyyy-M
 9. **`suggestedTestScenarios` 必須是中文** — Analyzer 產出的建議測試命名必須使用中文三段式格式
 10. **版本相依性** — TUnit 0.6.123 與 Testing.Platform 版本鏈鎖必須遵守
 11. **不得以目標名稱分流** — 不可因類別名稱、專案名稱、歷史案例或 benchmark 目標而改變委派策略、流程門檻或品質判準；決策必須只依 Analyzer 結構化輸入與實際執行風險
+12. **計時記錄**：每個階段的開始與結束時間以及耗時 (xx 分鐘 xx 秒)，以及整個工作流程的總耗時 (xx 分鐘 xx 秒)

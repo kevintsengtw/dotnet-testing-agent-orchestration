@@ -327,3 +327,4 @@ PowerShell 語法：`Add-Content "{logFile}" "{EVENT} $(Get-Date -Format 'yyyy-M
 10. **AppHost 啟動超時保護** — Aspire 測試需啟動多個容器，Executor 必須使用長超時設定（10 分鐘+）
 11. **sourceCodeContext 前向傳遞** — Analyzer 報告中的 `sourceCodeContext` 必須完整嵌入 Writer 和 Reviewer 的委派 prompt，避免 subagent 重複讀取相同的原始碼檔案
 12. **不得以目標名稱分流** — 不可因 Resource 名稱、專案名稱、歷史案例或 benchmark 目標而改變委派策略、流程門檻或品質判準；決策必須只依 Analyzer 結構化輸入與實際執行風險
+13. **計時記錄**：每個階段的開始與結束時間以及耗時 (xx 分鐘 xx 秒)，以及整個工作流程的總耗時 (xx 分鐘 xx 秒)
