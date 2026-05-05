@@ -12,6 +12,7 @@
   - [各 Subagent 職責說明](#各-subagent-職責說明)
   - [使用的 Agent Skills](#使用的-agent-skills)
     - [Skills 分類](#skills-分類)
+    - [Skills 查詢機制（mcp-local-rag）](#skills-查詢機制mcp-local-rag)
   - [關鍵特色](#關鍵特色)
     - [指揮者不執行原則](#指揮者不執行原則)
     - [三種目標類型深度分析](#三種目標類型深度分析)
@@ -61,11 +62,11 @@ flowchart TD
     style Reviewer fill:#f3e5f5,stroke:#7b1fa2
 ```
 
-| 項目          | 說明                                                                                                     |
-| ------------- | -------------------------------------------------------------------------------------------------------- |
-| **模型配置**  | Claude Sonnet 4.6 / Claude Opus 4.6（Fallback）                                                          |
-| **工具**      | `agent`, `read`, `search`, `usages`, `search/listDirectory`                                              |
-| **Subagents** | `dotnet-testing-analyzer`, `dotnet-testing-writer`, `dotnet-testing-executor`, `dotnet-testing-reviewer` |
+| 項目          | 說明                                                                                                                     |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| **模型配置**  | `GPT-5.3-Codex (copilot)` / `GPT-5.4 (copilot)`（Fallback）                                                              |
+| **工具**      | `agent`, `read`, `search`, `search/usages`, `search/listDirectory`, `execute/runInTerminal`, `execute/getTerminalOutput` |
+| **Subagents** | `dotnet-testing-analyzer`, `dotnet-testing-writer`, `dotnet-testing-executor`, `dotnet-testing-reviewer`                 |
 
 ---
 
@@ -159,7 +160,8 @@ Orchestrator 將分析報告傳給 `dotnet-testing-writer`，Writer 根據 `requ
 Orchestrator 將 Writer 產出的測試程式碼交給 `dotnet-testing-executor` 建置與執行。
 
 - Executor 執行 `dotnet build` + `dotnet test`
-- 如果測試失敗，進入修正迴圈（最多 3 輪）
+- 若首輪建置成功且所有測試通過（fast-path），直接回傳結果，不進入修正迴圈
+- 若測試失敗，進入修正迴圈（最多 3 輪）
 - 回傳執行結果、修正紀錄、最終測試狀態
 
 ### Phase 4：委派審查（Reviewer）
@@ -174,12 +176,12 @@ Orchestrator 將測試程式碼交給 `dotnet-testing-reviewer` 審查。
 
 ## 各 Subagent 職責說明
 
-| Subagent                    | 角色   | 主要職責                                               | 核心工具                                |
-| --------------------------- | ------ | ------------------------------------------------------ | --------------------------------------- |
+| Subagent                    | 角色   | 主要職責                                               | 核心工具                                 |
+| --------------------------- | ------ | ------------------------------------------------------ | ---------------------------------------- |
 | **dotnet-testing-analyzer** | 分析者 | 分析被測試目標的依賴、方法、目標類型，回傳結構化報告   | `read`, `search`, `search/listDirectory` |
-| **dotnet-testing-writer**   | 撰寫者 | 載入 Agent Skills，依據分析報告撰寫測試程式碼          | `read`, `search`, `edit`, `runCommands` |
-| **dotnet-testing-executor** | 執行者 | 執行 `dotnet build` + `dotnet test`，修正編譯/執行錯誤 | `read`, `edit`, `runCommands`           |
-| **dotnet-testing-reviewer** | 審查者 | 審查測試程式碼品質，驗證覆蓋率與命名規範               | `read`, `search`                        |
+| **dotnet-testing-writer**   | 撰寫者 | 載入 Agent Skills，依據分析報告撰寫測試程式碼          | `read`, `search`, `edit`, `runCommands`  |
+| **dotnet-testing-executor** | 執行者 | 執行 `dotnet build` + `dotnet test`，修正編譯/執行錯誤 | `read`, `edit`, `runCommands`            |
+| **dotnet-testing-reviewer** | 審查者 | 審查測試程式碼品質，驗證覆蓋率與命名規範               | `read`, `search`                         |
 
 ---
 
@@ -200,6 +202,14 @@ Orchestrator 將測試程式碼交給 `dotnet-testing-reviewer` 審查。
 | **其他**     | `test-output-logging`、`private-internal-testing`、`fluentvalidation-testing`                                                                                                                           |
 
 > 每次測試任務不會載入所有 Skills，而是根據分析結果精準載入所需的子集，以降低 Context Window 壓力。
+
+### Skills 查詢機制（mcp-local-rag）
+
+Writer 與 Reviewer 透過 `mcp-local-rag` 進行語意查詢，取代直接讀取 SKILL.md。在 subagent 執行模式下，查詢依下列順序降級：
+
+1. **MCP protocol tool**（`mcp:dotnet-testing-skills/query_documents`）— Writer 優先使用
+2. **CLI**（`mcp-local-rag --db-path .mcp/dotnet-testing-skills query`）— Reviewer 在 subagent 模式下優先使用，因 MCP tool 不保證可用
+3. **直接讀取 SKILL.md** — MCP 與 CLI 均不可用時的最終 fallback
 
 ---
 
@@ -279,3 +289,4 @@ Orchestrator 會整合四個 subagent 的回傳結果，呈現以下內容：
 - 建議增加的測試案例
 - 使用的技術組合（載入了哪些 Skills）
 - Executor 修正紀錄（如果有的話）
+- Phase timing 記錄（計時記錄檔：`orchestrator-timing.log`，包含各階段開始／結束時間與總耗時）

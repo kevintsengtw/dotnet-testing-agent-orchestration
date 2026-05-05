@@ -15,6 +15,7 @@
     - [Agent Orchestrators](#agent-orchestrators)
     - [Agent Skills](#agent-skills)
     - [驗證專案](#驗證專案)
+  - [v2.0.0 主要特色](#v200-主要特色)
   - [快速開始](#快速開始)
     - [前置需求](#前置需求)
     - [VS Code 設定](#vs-code-設定)
@@ -148,6 +149,25 @@ Skills 內容由 `dotnet-testing-agent-skills` 統一維護，使用者需另行
 
 ---
 
+## v2.0.0 主要特色
+
+v2.0.0 針對 GitHub Copilot 執行環境進行工作流程調整，核心變更如下：
+
+| 特色                       | 說明                                                                                             |
+| -------------------------- | ------------------------------------------------------------------------------------------------ |
+| **mcp-local-rag 技能查詢** | 以語意查詢取代逐一讀取 SKILL.md，降低多 skill 場景的 tool call 成本                              |
+| **結構化 JSON handoff**    | Analyzer、Writer、Executor 中間結果改存 `.orchestrator/{TargetName}/` JSON 檔，減少 context 壓力 |
+| **Phase timing 記錄**      | 各 Orchestrator 輸出 phase 開始／結束與總耗時 log，提升工作流程可觀測性                          |
+| **統一模型配置**           | 所有 Subagents 主要模型：`GPT-5.3-Codex (copilot)`，備用模型：`GPT-5.4 (copilot)`                |
+
+工作流程完成後，回覆訊息會顯示各階段的耗時紀錄：
+
+![Phase timing 記錄](images/v2_0_0/v2_phase_timing_logs.png)
+
+詳細變更說明與升級步驟請參考 [docs/v2_0_0/RELEASE_OVERVIEW.md](docs/v2_0_0/RELEASE_OVERVIEW.md)。
+
+---
+
 ## 快速開始
 
 ### 前置需求
@@ -178,7 +198,31 @@ Skills 內容由 `dotnet-testing-agent-skills` 統一維護，使用者需另行
 
 啟用 **Autopilot**（VS Code 1.111+）後，多階段 Agent Orchestration 工作流程可自動完成各 subagent 之間的確認步驟，減少手動介入。詳見 [VS Code 1.111 Release Notes](https://code.visualstudio.com/updates/v1_111)。
 
+點選 Chat 面板底部的核准模式選單，選擇 **Autopilot（預覽）**：
+
+![選擇 Autopilot 模式](images/v2_0_0/v2_copilot_chat_panel_autopilot_1.png)
+
+啟用後，面板底部會顯示 **Autopilot（預覽）** 標示：
+
+![Autopilot 已啟用](images/v2_0_0/v2_copilot_chat_panel_autopilot_2.png)
+
 若需要檢視 orchestration 的執行過程與各階段交接內容，可在 Copilot Chat 中開啟 **Agent Debug Panel**（VS Code 1.110+）。其中的 **Agent Flow Chart view** 可以視覺化呈現 `dotnet-testing-orchestrator` 的執行流程，讓使用者清楚看到各 Subagent（Analyzer、Writer、Executor、Reviewer）的執行狀態與交接過程。詳見 [VS Code 1.110 Release Notes](https://code.visualstudio.com/updates/v1_110) 與 [Agent Debug View 文件](https://code.visualstudio.com/docs/copilot/chat/chat-debug-view)。
+
+使用 Command Palette（`Ctrl+Shift+P`）搜尋並執行 **開發人員：開啟 Agent 偵錯記錄**：
+
+![開啟 Agent 偵錯記錄](images/v2_0_0/v2_agent_debug_logs_1.png)
+
+開啟後，在 Agent 偵錯記錄面板選取要偵錯的聊天工作階段：
+
+![選取聊天工作階段](images/v2_0_0/v2_agent_debug_logs_2.png)
+
+可檢視工作階段的摘要資訊（模型回合、工具呼叫、權杖用量等），並切換至 **Agent 流程圖** 檢視：
+
+![工作階段摘要與 Agent 流程圖按鈕](images/v2_0_0/v2_agent_debug_logs_3.png)
+
+Agent 流程圖以視覺化方式呈現各 Subagent 的執行流程與交接過程：
+
+![Agent 流程圖](images/v2_0_0/v2_agent_debug_logs_4.png)
 
 ### mcp-local-rag 設定
 
@@ -235,6 +279,10 @@ python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py --skills-path /p
 3. 將模式切換為 **Agent**
 4. 從 Agent 下拉選單選擇目標 Orchestrator（例如 `dotnet-testing-orchestrator` 或 `dotnet-testing-advanced-integration-orchestrator`）
 5. 直接在 Chat 輸入測試需求
+
+選擇 Agent 後，Chat 面板底部會顯示已選取的 Orchestrator 與使用的模型：
+
+![選擇 dotnet-testing-orchestrator](images/v2_0_0/v2_copilot_chat_panel_agent.png)
 
 範例提示詞（單元測試）：
 
