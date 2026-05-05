@@ -209,7 +209,7 @@ PowerShell 語法：`Add-Content "{logFile}" "{EVENT} $(Get-Date -Format 'yyyy-M
 
 ### 必呈現的內容
 
-1. **測試程式碼**：Writer 產出的完整測試檔案（含 WebApiFactory、TestBase、測試類別等所有檔案）
+1. **測試檔案資訊**：Writer 產出的檔案路徑、檔名、測試方法數與資料展開摘要（**預設不貼完整程式碼**）
 2. **執行結果摘要**：Executor 的 `dotnet test` 是否全數通過、有幾個測試案例
 3. **Docker 環境狀態**：Executor 的環境檢查結果
 4. **品質審查摘要**：Reviewer 的 `overallScore` 和關鍵 `issues`
@@ -217,14 +217,18 @@ PowerShell 語法：`Add-Content "{logFile}" "{EVENT} $(Get-Date -Format 'yyyy-M
 6. **使用的 Skills 組合**：列出 Writer 載入了哪些 Integration Skills
 7. **Executor 修正紀錄**（如果有的話）：Executor 修正了哪些編譯/執行錯誤
 8. **生產程式碼 Bug 發現**（如果有的話）：Executor 在修正迴圈中發現並修正的生產程式碼缺陷，需特別標記
+9. **完整程式碼顯示條件**：只有在使用者明確要求「顯示完整測試程式碼」時，才輸出完整程式碼
 
 ### 呈現格式範例
 
 ```markdown
 ## 整合測試結果
 
-### ✅ 測試程式碼
-[完整的測試程式碼，含 WebApiFactory、TestBase、測試類別]
+### ✅ 測試檔案
+- 測試檔案：[路徑]
+- 測試方法數：X
+- 資料展開後總案例：Y
+- 說明：預設不顯示完整程式碼，可依需求展開
 
 ### 📊 執行結果
 - 測試數量：X 個
