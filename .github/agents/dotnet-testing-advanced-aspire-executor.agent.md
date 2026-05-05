@@ -3,7 +3,7 @@ name: dotnet-testing-advanced-aspire-executor
 description: '建置與執行 .NET Aspire 整合測試，處理 Docker + Aspire workload 環境檢查、編譯錯誤與測試失敗的修正迴圈'
 user-invocable: false
 tools: ['read', 'search', 'edit', 'execute/getTerminalOutput', 'execute/runInTerminal', 'read/terminalLastCommand', 'read/terminalSelection', 'execute/createAndRunTask']
-model: Claude Sonnet 4.6 (copilot)
+model: ['GPT-5.3-Codex (copilot)', 'GPT-5.4 (copilot)']
 ---
 
 # .NET Aspire 整合測試執行器
@@ -134,7 +134,7 @@ dotnet test <solution-path> --no-build --verbosity minimal --blame-hang-timeout 
 
 ```
 📊 Aspire 整合測試執行結果
-   方案：Aspire.Samples.slnx
+   方案：<solution-path>
    Docker 狀態：✅ 可用（Docker Desktop 4.x.x）
    Aspire Workload：✅ 已安裝
    建置結果：✅ 成功
@@ -148,7 +148,7 @@ dotnet test <solution-path> --no-build --verbosity minimal --blame-hang-timeout 
 
 ```
 📊 Aspire 整合測試執行結果
-   方案：Aspire.Samples.slnx
+   方案：<solution-path>
    Docker 狀態：✅ 可用
    Aspire Workload：✅ 已安裝
    建置結果：✅ 成功
@@ -232,3 +232,4 @@ dotnet test <solution-path> --no-build --verbosity minimal --blame-hang-timeout 
 6. **防掛保護（必要）** — Aspire 測試需啟動 AppHost + 多個容器，`dotnet test` 必須使用 `--blame-hang-timeout` 參數（8.x/9.x: `10m`、13.x+: `15m`）。**注意**：`--timeout` 不是 `dotnet test` 的有效參數，會導致 MSB1001 錯誤。若工具呼叫本身有超時限制，也應配合設定足夠的等待時間
 7. **精確錯誤分類** — 區分「測試碼錯誤」vs「環境問題」（Docker、容器啟動），影響修正策略
 8. **容器清理** — 不需要手動清理容器，Aspire + `IAsyncLifetime.DisposeAsync` 會自動處理
+9. **不得以目標名稱分流** — 不可因 Resource 名稱、專案名稱、歷史案例或 benchmark 目標而改變錯誤分類、修正策略或回報門檻；決策必須只依實際錯誤訊息與執行結果

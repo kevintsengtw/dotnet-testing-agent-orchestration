@@ -2,7 +2,7 @@
 
 ## 專案概述
 
-本 Repository 為 **.NET Testing Agent Orchestration**，包含 Agent 定義檔、Skills、Custom Prompts 以及驗證專案，用於驗證 `dotnet-testing` 及 `dotnet-testing-advanced` Agent Skills 搭配 Orchestrator 的泛化能力。目標是確保 AI Agent 能夠將技能知識應用到「未見過」的程式碼。
+本 Repository 為 **.NET Testing Agent Orchestration**，包含 Agent 定義檔、Skills、文件與驗證專案，用於驗證 `dotnet-testing` 及 `dotnet-testing-advanced` Agent Skills 搭配 Orchestrator 的泛化能力。目標是確保 AI Agent 能夠將技能知識應用到「未見過」的程式碼。
 
 ---
 
@@ -12,13 +12,13 @@
 dotnet-testing-agent-orchestration/
 ├── .github/
 │   ├── agents/                  # Agent 定義檔（4 Orchestrators + 16 Subagents = 20 個）
-│   ├── prompts/                 # GitHub Copilot Custom Prompts（16 個）
-│   ├── skills/                  # GitHub Copilot Agent Skills（29 共用 + 1 專案專用 + 4 OpenSpec）
+│   ├── skills/                  # GitHub Copilot Agent Skills（29 共用 + 1 專案專用）
 │   └── copilot-instructions.md  # 本檔案
 ├── docs/
 │   ├── agent_orchestration/     # Agent Orchestration 相關文件
+│   ├── mcp_local_rag/           # mcp-local-rag 安裝、索引與排查文件
 │   ├── skills/                  # Agent Skills 相關文件
-│   └── prompts/                 # Prompt 相關文件
+│   └── v2_0_0/                  # v2.0.0 發佈、升級與故障排查文件
 ├── samples/                     # 驗證專案（各含 3 種 .NET 版本）
 │   ├── practice/                # 單元測試驗證專案
 │   ├── practice_integration/    # 整合測試驗證專案

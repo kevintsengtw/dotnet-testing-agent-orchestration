@@ -3,7 +3,7 @@ name: dotnet-testing-advanced-tunit-executor
 description: '建置與執行 TUnit 測試，處理 Source Generator 建置、dotnet run 執行、編譯錯誤與測試失敗的修正迴圈'
 user-invocable: false
 tools: ['read', 'search', 'edit', 'execute/getTerminalOutput', 'execute/runInTerminal', 'read/terminalLastCommand', 'read/terminalSelection', 'execute/createAndRunTask']
-model: Claude Sonnet 4.6 (copilot)
+model: ['GPT-5.3-Codex (copilot)', 'GPT-5.4 (copilot)']
 ---
 
 # TUnit 測試執行器
@@ -93,9 +93,9 @@ TUnit 的輸出格式與 xUnit 不同：
 ╚══██╔══╝██║   ██║████╗  ██║██║╚══██╔══╝
    ...
 
-[✓52/x0/↓0] TUnit.Sample.Tests.dll (net9.0|x64)
+[✓52/x0/↓0] MyCompany.TUnit.Tests.dll (net9.0|x64)
 
-測試回合摘要： 成功! - bin\Debug\net9.0\TUnit.Sample.Tests.dll (net9.0|x64)
+測試回合摘要： 成功! - bin\Debug\net9.0\MyCompany.TUnit.Tests.dll (net9.0|x64)
   total: 53
   failed: 0
   succeeded: 53
@@ -157,7 +157,7 @@ TUnit 的輸出格式與 xUnit 不同：
    測試結果：❌ 部分失敗（10/12 通過，2 失敗）
    修正迴圈：3 次（已達上限）
    未解決的失敗：
-   1. EmployeeServiceTests.CalculateAnnualBonus_績效為0_應擲出例外
+   1. TargetServiceTests.CalculateAnnualMetric_輸入無效_應擲出例外
       原因：預期 ArgumentException 但未擲出
       分類：測試邏輯問題
 ```
@@ -235,3 +235,4 @@ TUnit 的輸出格式與 xUnit 不同：
 7. **完整回報** — 包含建置結果、執行方式、測試結果、修正歷史
 8. **TUnit 輸出解讀** — 正確解讀 TUnit 的 `✓`/`x`/`↓` 輸出格式
 9. **精確錯誤分類** — 區分「TUnit 設定錯誤」vs「測試邏輯錯誤」vs「版本相容性問題」
+10. **不得以目標名稱分流** — 不可因類別名稱、專案名稱、歷史案例或 benchmark 目標而改變錯誤分類、修正策略或回報門檻；決策必須只依實際錯誤訊息與執行結果

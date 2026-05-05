@@ -2,8 +2,8 @@
 name: dotnet-testing-advanced-aspire-analyzer
 description: '分析 .NET Aspire AppHost 專案的 Resource 結構、服務依賴、容器需求，產出 Aspire 整合測試分析報告'
 user-invocable: false
-tools: ['read', 'search', 'search/usages', 'search/listDirectory']
-model: Claude Sonnet 4.6 (copilot)
+tools: ['read', 'search', 'search/usages', 'search/listDirectory', 'execute/runInTerminal']
+model: ['GPT-5.3-Codex (copilot)', 'GPT-5.4 (copilot)']
 ---
 
 # .NET Aspire 整合測試分析器
@@ -168,11 +168,11 @@ Aspire Analyzer **固定輸出單一 Skill**：
 
 ```json
 {
-  "projectName": "Aspire.AppHost",
+  "projectName": "MyCompany.AppHost",
   "orchestrationType": "aspire",
   "appHostInfo": {
-    "projectPath": "samples/aspire/src/Aspire.AppHost/Aspire.AppHost.csproj",
-    "programCsPath": "samples/aspire/src/Aspire.AppHost/Program.cs",
+    "projectPath": "workspace/src/MyCompany.AppHost/MyCompany.AppHost.csproj",
+    "programCsPath": "workspace/src/MyCompany.AppHost/Program.cs",
     "aspireVersion": "9.0.0",
     "resources": [
       {
@@ -208,8 +208,8 @@ Aspire Analyzer **固定輸出單一 Skill**：
     "containerLifetime": "not-set"
   },
   "apiProjectInfo": {
-    "projectPath": "samples/integration/src/Integration.WebApi/Integration.WebApi.csproj",
-    "programCsPath": "samples/integration/src/Integration.WebApi/Program.cs",
+    "projectPath": "workspace/src/MyCompany.WebApi/MyCompany.WebApi.csproj",
+    "programCsPath": "workspace/src/MyCompany.WebApi/Program.cs",
     "apiArchitecture": "controller-based",
     "endpoints": [
       {
@@ -256,28 +256,28 @@ Aspire Analyzer **固定輸出單一 Skill**：
   "projectContext": {
     "targetFramework": "net9.0",
     "testFramework": "xunit",
-    "solutionPath": "samples/aspire/Aspire.Samples.slnx",
-    "appHostProjectPath": "samples/aspire/src/Aspire.AppHost/Aspire.AppHost.csproj",
-    "testProjectPath": "samples/aspire/tests/Aspire.AppHost.Tests/Aspire.AppHost.Tests.csproj"
+    "solutionPath": "workspace/MyCompany.Aspire.slnx",
+    "appHostProjectPath": "workspace/src/MyCompany.AppHost/MyCompany.AppHost.csproj",
+    "testProjectPath": "workspace/tests/MyCompany.AppHost.Tests/MyCompany.AppHost.Tests.csproj"
   },
   "sourceCodeContext": {
-    "appHostProgramCs": { "path": "samples/.../AppHost/Program.cs", "content": "完整檔案內容" },
-    "appHostCsproj": { "path": "samples/.../AppHost/AppHost.csproj", "content": "完整檔案內容" },
-    "apiProgramCs": { "path": "samples/.../WebApi/Program.cs", "content": "完整檔案內容" },
-    "apiCsproj": { "path": "samples/.../WebApi/WebApi.csproj", "content": "完整檔案內容" },
+    "appHostProgramCs": { "path": "workspace/src/MyCompany.AppHost/Program.cs", "content": "完整檔案內容" },
+    "appHostCsproj": { "path": "workspace/src/MyCompany.AppHost/MyCompany.AppHost.csproj", "content": "完整檔案內容" },
+    "apiProgramCs": { "path": "workspace/src/MyCompany.WebApi/Program.cs", "content": "完整檔案內容" },
+    "apiCsproj": { "path": "workspace/src/MyCompany.WebApi/MyCompany.WebApi.csproj", "content": "完整檔案內容" },
     "controllers": [
-      { "path": "samples/.../Controllers/XxxController.cs", "content": "完整檔案內容" }
+      { "path": "workspace/src/MyCompany.WebApi/Controllers/XxxController.cs", "content": "完整檔案內容" }
     ],
     "models": [
-      { "path": "samples/.../Models/Xxx.cs", "content": "完整檔案內容" }
+      { "path": "workspace/src/MyCompany.WebApi/Models/Xxx.cs", "content": "完整檔案內容" }
     ],
-    "dbContext": { "path": "samples/.../Data/XxxDbContext.cs", "content": "完整檔案內容" },
+    "dbContext": { "path": "workspace/src/MyCompany.WebApi/Data/XxxDbContext.cs", "content": "完整檔案內容" },
     "validators": [
-      { "path": "samples/.../Validators/XxxValidator.cs", "content": "完整檔案內容" }
+      { "path": "workspace/src/MyCompany.WebApi/Validators/XxxValidator.cs", "content": "完整檔案內容" }
     ],
-    "testCsproj": { "path": "samples/.../Tests/Tests.csproj", "content": "完整檔案內容" },
+    "testCsproj": { "path": "workspace/tests/MyCompany.AppHost.Tests/MyCompany.AppHost.Tests.csproj", "content": "完整檔案內容" },
     "existingTestFiles": [
-      { "path": "samples/.../Tests/Infrastructure/XxxFixture.cs", "content": "完整檔案內容" }
+      { "path": "workspace/tests/MyCompany.AppHost.Tests/Infrastructure/XxxFixture.cs", "content": "完整檔案內容" }
     ]
   }
 }
@@ -297,3 +297,14 @@ Aspire Analyzer **固定輸出單一 Skill**：
 8. **服務名稱精確** — `projectReferences[].name` 必須與 AppHost 中 `AddProject("name")` 的名稱參數完全一致，這會影響 `CreateHttpClient("name")` 的正確性
 9. **Aspire 版本記錄** — 從 `.csproj` 中擷取 Aspire 版本，需處理兩種 csproj 格式：**(A) 分離 SDK 格式**（`<Sdk Name="Aspire.AppHost.Sdk" Version="X.Y.Z" />`，適用 Aspire 8.x/9.x）：版本以 `Aspire.Hosting.AppHost` 套件版本為準（當 SDK 版本與套件版本不同時，以套件版本為權威來源，例如 SDK 9.0.0 + 套件 8.2.2 → Aspire 版本為 8.2.2）；**(B) Project SDK 格式**（`<Project Sdk="Aspire.AppHost.Sdk/X.Y.Z">`，適用 Aspire 13.x）：此格式無獨立 `Aspire.Hosting.AppHost` 套件參考，版本從 SDK 屬性取得
 10. **sourceCodeContext 完整性** — 所有在 Step 1-4 中讀取的原始碼檔案必須收錄至 `sourceCodeContext`，供下游 Writer 和 Reviewer 直接使用，避免重複讀取。`content` 欄位必須是完整檔案內容，不可是摘要或節錄
+11. **不得以目標名稱分流** — 不可因 Resource 名稱、專案名稱、歷史案例或 benchmark 目標而調整分析深度、輸出判準或建議策略；分析決策必須只依實際程式碼與 AppHost 拓撲結構
+
+---
+
+## JSON 交接輸出
+
+完成分析後，如果 Orchestrator 在 prompt 中指定了 JSON 輸出路徑（格式：`.orchestrator/{TargetName}/analyzer-result.json`），使用 `execute/runInTerminal` 將分析結果寫入該路徑：
+
+`$json = '{...}'; Set-Content -Path ".orchestrator/{TargetName}/analyzer-result.json" -Value $json -Encoding UTF8`
+
+其中 `{...}` 為上方 JSON 格式的完整分析報告內容。

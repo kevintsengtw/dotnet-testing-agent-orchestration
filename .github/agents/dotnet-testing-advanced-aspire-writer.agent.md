@@ -2,8 +2,8 @@
 name: dotnet-testing-advanced-aspire-writer
 description: '根據 Analyzer 分析結果載入 aspire-testing Skill，撰寫符合最佳實踐的 .NET Aspire 整合測試'
 user-invocable: false
-tools: ['read', 'search', 'edit', 'execute/getTerminalOutput','execute/runInTerminal','read/terminalLastCommand','read/terminalSelection']
-model: ['Claude Sonnet 4.6 (copilot)', 'GPT-5.1-Codex-Max (copilot)']
+tools: ['read', 'search', 'edit', 'execute/getTerminalOutput','execute/runInTerminal','read/terminalLastCommand','read/terminalSelection','mcp:dotnet-testing-skills/query_documents']
+model: ['GPT-5.3-Codex (copilot)', 'GPT-5.4 (copilot)']
 ---
 
 # .NET Aspire 整合測試撰寫器
@@ -22,17 +22,22 @@ model: ['Claude Sonnet 4.6 (copilot)', 'GPT-5.1-Codex-Max (copilot)']
 
 ## 撰寫流程
 
-### Step 1：載入 Skill
+### Step 0：讀取 JSON 交接資訊（如果可用）
 
-Writer **固定載入唯一的 Skill**：
+如果 Orchestrator 在 prompt 中提供了 `analyzer-result.json` 的路徑（格式：`.orchestrator/{TargetName}/analyzer-result.json`），使用 `execute/runInTerminal` 讀取該檔案：
 
-| Skill | 路徑 | 載入條件 |
-|-------|------|---------|
-| `aspire-testing` | `.github/skills/dotnet-testing-advanced-aspire-testing/SKILL.md` | **必載**（唯一 Skill） |
+`Get-Content -Path ".orchestrator/{TargetName}/analyzer-result.json" -Raw`
 
-使用 `read` 工具讀取 SKILL.md 檔案。
+若檔案存在，以其完整 JSON 內容作為 Analyzer 分析報告的**首要參考**（比 Orchestrator prompt 中的摘要更完整精確）。
 
-**嚴格規則**：載入 Skill 檔案後，必須在後續的撰寫過程中**遵循 Skill 中定義的所有規則與模式**。這是最高優先級指令。
+### Step 1：透過 RAG 索引庫取得技術知識
+
+Writer **固定查詢 aspire-testing 技術知識**（唯一查詢）：
+
+- Query: `"DistributedApplicationTestingBuilder AppHost Aspire integration testing AspireAppFixture IAsyncLifetime ContainerLifetime.Session DistributedApplication.CreateAsync ResourceNotificationService Respawn CreateHttpClient WaitForHealthyAsync"`
+- Limit: 10
+
+**查詢完成後，以查詢結果作為技術知識來源。嚴格規則**：必須在後續的撰寫過程中**遵循查詢結果中定義的所有規則與模式**。這是最高優先級指令。
 
 ### Step 1.1：使用 Orchestrator 提供的 sourceCodeContext（效率最佳化）
 
@@ -375,6 +380,10 @@ public async Task WebApi健康檢查_服務啟動完成_應回傳Healthy狀態()
 6. tests/.../Integration/ProductsApiTests.cs
 ```
 
+**JSON 交接輸出**：如果 Orchestrator 在 prompt 中指定了 `writer-result.json` 的輸出路徑（格式：`.orchestrator/{TargetName}/writer-result.json`），完成測試撰寫後用 `execute/runInTerminal` 記錄測試檔案路徑：
+
+`Add-Content -Path ".orchestrator/{TargetName}/writer-result.json" -Value "{test-file-path}" -Encoding UTF8`
+
 ---
 
 ## 撰寫規則
@@ -547,3 +556,4 @@ var connectionString = config.GetConnectionString("BookingsDb"); // 返回 null!
 9. **中文三段式命名** — 所有測試方法必須使用中文三段式命名格式
 10. **ContainerLifetime.Session 版本相依設定** — `ContainerLifetime.Session` API 從 **Aspire 9.0 起才引入**，Aspire 8.x **不支援**（會導致編譯錯誤，Writer 必須跳過）。**Aspire 9.0+** 時，撰寫測試前**必須**檢查 AppHost 的 `Program.cs`，確認所有容器資源已設定 `.WithLifetime(ContainerLifetime.Session)`，若未設定則主動加入。Aspire 13.x+ 此為**必要配置**（容器啟動行為更嚴格），9.x 為**建議設定**。見 Step 3 前置條件
 11. **Aspire 13.1.0+ Redis TLS 處理** — Aspire 13.1.0 起預設對 Redis 容器啟用 TLS（[dotnet/aspire#13612](https://github.com/dotnet/aspire/issues/13612)）。若被編排的 WebAPI 使用手動 `ConnectionMultiplexer.Connect()` 連線 Redis（而非 Aspire 的 `builder.AddRedisClient()` 元件），Writer **必須**在 AppHost 的 Redis 資源上加入 `.WithoutHttpsCertificate()`（需 `#pragma warning disable ASPIRECERTIFICATES001`）。見 Step 3 前置條件
+12. **不得以目標名稱分流** — 不可因 Resource 名稱、專案名稱、歷史案例或 benchmark 目標而調整測試撰寫策略、覆蓋門檻或規則判準；所有決策必須只依 Analyzer 結構化輸入與 `aspire-testing` Skill 規範

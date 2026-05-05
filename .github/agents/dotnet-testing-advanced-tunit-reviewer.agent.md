@@ -3,7 +3,7 @@ name: dotnet-testing-advanced-tunit-reviewer
 description: '審查 TUnit 測試的品質，載入品質相關 Skills 驗證命名、斷言、TUnit 合規性等最佳實踐'
 user-invocable: false
 tools: ['read', 'search', 'search/listDirectory', 'execute/getTerminalOutput','execute/runInTerminal','read/terminalLastCommand','read/terminalSelection']
-model: ['Claude Sonnet 4.6 (copilot)', 'GPT-5.1-Codex-Max (copilot)']
+model: ['GPT-5.3-Codex (copilot)', 'GPT-5.4 (copilot)']
 ---
 
 # TUnit 測試審查器
@@ -20,6 +20,15 @@ model: ['Claude Sonnet 4.6 (copilot)', 'GPT-5.1-Codex-Max (copilot)']
 ---
 
 ## 審查流程
+
+### Step 0：讀取 JSON 交接資訊（如果可用）
+
+如果 Orchestrator 在 prompt 中提供了 JSON 交接檔案路徑，使用 `execute/runInTerminal` 讀取：
+
+- 讀取 Analyzer 分析報告：`Get-Content -Path ".orchestrator/{TargetName}/analyzer-result.json" -Raw`
+- 讀取 Executor 執行結果：`Get-Content -Path ".orchestrator/{TargetName}/executor-result.json" -Raw`
+
+以這些 JSON 檔案的內容補充 Orchestrator 傳來的 prompt 資訊，取得更完整的分析背景與執行結果。
 
 ### Step 1：載入 Skills
 
@@ -79,7 +88,7 @@ dotnet run --no-build
 
 | 檢查項目 | 規則 | 範例 |
 |---------|------|------|
-| 測試類別命名 | `{被測類別}Tests` | `EmployeeServiceTests`、`CalculatorTests` |
+| 測試類別命名 | `{被測類別}Tests` | `TargetServiceTests`、`SupportingServiceTests` |
 | 測試方法命名 | 中文三段式 `方法_情境_預期` | `ValidateEmployee_名字為空_應回傳驗證失敗` |
 | 方法命名語意 | 情境與預期必須明確、具體 | ❌ `Calculate_失敗_回傳錯誤` → ✅ `CalculateBonus_績效為0_應擲出ArgumentException` |
 
@@ -175,12 +184,12 @@ dotnet run --no-build
 
 ### ✅ [4d-01] TUnit 合規性 — OutputType 正確
 
-**檔案**：`TUnit.Sample.Tests.csproj`
+**檔案**：`MyCompany.TUnit.Tests.csproj`
 **說明**：`<OutputType>Exe</OutputType>` 已正確設定
 
 ### ✅ [4d-02] TUnit 合規性 — 無 Microsoft.NET.Test.Sdk
 
-**檔案**：`TUnit.Sample.Tests.csproj`
+**檔案**：`MyCompany.TUnit.Tests.csproj`
 **說明**：未包含 `Microsoft.NET.Test.Sdk`，符合 TUnit 要求
 
 ### ✅ [4d-03] TUnit 合規性 — 所有測試方法為 async Task
@@ -236,3 +245,4 @@ dotnet run --no-build
 7. **覆蓋率以方法為單位** — 以被測類別的公開方法 × 情境為單位計算覆蓋率
 8. **公正客觀** — 報告必須反映真實狀況，不誇大也不輕描淡寫
 9. **xUnit 殘留零容忍** — 任何 xUnit 屬性、套件引用殘留都是 FAIL，不是 WARN
+10. **不得以目標名稱分流** — 不可因類別名稱、專案名稱、歷史案例或 benchmark 目標而調整審查門檻、評級邏輯或判準；審查結論必須只依實際程式碼與測試結果

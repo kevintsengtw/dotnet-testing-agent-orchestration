@@ -2,8 +2,8 @@
 name: dotnet-testing-advanced-tunit-analyzer
 description: '分析 .NET 被測試目標的類別結構、依賴項，判斷 TUnit 功能需求，產出 TUnit 測試分析報告'
 user-invocable: false
-tools: ['read', 'search', 'search/usages', 'search/listDirectory']
-model: Claude Sonnet 4.6 (copilot)
+tools: ['read', 'search', 'search/usages', 'search/listDirectory', 'execute/runInTerminal']
+model: ['GPT-5.3-Codex (copilot)', 'GPT-5.4 (copilot)']
 ---
 
 # TUnit 測試分析器
@@ -53,9 +53,9 @@ model: Claude Sonnet 4.6 (copilot)
 4. **定位方案檔（`.slnx` / `.sln`）（強制執行）**：
    - 從前一步找到的 `.csproj` 目錄向上逐層查找，使用 `search/listDirectory` 搜尋 `.slnx` 檔案
    - 若同目錄有多個 `.slnx`，依 `targetFramework` 選對應版本：
-     - `net8.0` → 優先選含 `Net8` 的 `.slnx`（例如 `Practice.TUnit.Net8.slnx`）
-     - `net9.0` → 優先選**不含**版本後綴的 `.slnx`（例如 `Practice.TUnit.slnx`）
-     - `net10.0` → 優先選含 `Net10` 的 `.slnx`（例如 `Practice.TUnit.Net10.slnx`）
+     - `net8.0` → 優先選檔名含 `Net8` 或 `net8` 的 `.slnx`
+     - `net9.0` → 優先選未標示版本後綴（或對應主要版本命名）的 `.slnx`
+     - `net10.0` → 優先選檔名含 `Net10` 或 `net10` 的 `.slnx`
    - 若只有 `.sln`，使用 `.sln` 路徑
    - 將確認存在的相對路徑（相對 workspace 根目錄）填入 `projectContext.solutionPath`
    - 若找不到任何方案檔，設為 `"UNKNOWN"`，並在輸出中警告 Executor 需手動確認
@@ -147,38 +147,38 @@ model: Claude Sonnet 4.6 (copilot)
 
 ```json
 {
-  "projectName": "TUnit.Sample.Tests",
+  "projectName": "MyCompany.TUnit.Tests",
   "testFramework": "tunit",
   "migrationSource": null,
   "targetClasses": [
     {
-      "className": "EmployeeService",
-      "filePath": "samples/verification/src/Verification.Core/Services/EmployeeService.cs",
+      "className": "TargetService",
+      "filePath": "workspace/src/MyCompany.Core/Services/TargetService.cs",
       "dependencies": [
         {
-          "type": "IEmployeeRepository",
+          "type": "ITargetRepository",
           "mockRequired": true
         }
       ],
       "methods": [
         {
-          "name": "ValidateEmployee",
-          "parameters": [{ "name": "employee", "type": "Employee" }],
+          "name": "ValidateTarget",
+          "parameters": [{ "name": "target", "type": "TargetEntity" }],
           "returnType": "ValidationResult",
           "testComplexity": "medium",
           "matrixCandidate": false,
           "matrixReason": null
         },
         {
-          "name": "CalculateAnnualBonus",
+          "name": "CalculateAnnualMetric",
           "parameters": [
-            { "name": "employee", "type": "Employee" },
-            { "name": "performanceRating", "type": "int" }
+            { "name": "target", "type": "TargetEntity" },
+            { "name": "level", "type": "int" }
           ],
           "returnType": "decimal",
           "testComplexity": "medium",
           "matrixCandidate": true,
-          "matrixReason": "績效等級 × 薪資 × 年資的多維組合"
+          "matrixReason": "等級 × 基礎值 × 權重的多維組合"
         }
       ]
     }
@@ -199,26 +199,26 @@ model: Claude Sonnet 4.6 (copilot)
   "requiredSkills": ["tunit-fundamentals", "tunit-advanced"],
   "existingTestInfrastructure": {
     "existingTestFiles": [
-      "TUnitFundamentalsTests.cs",
-      "TUnitAdvancedTests.cs"
+      "TargetServiceTests.cs",
+      "TargetServiceAdvancedTests.cs"
     ],
     "nugetPackages": ["TUnit 0.6.123", "AwesomeAssertions 9.1.0", "Bogus 35.6.1"],
     "hasGlobalUsings": true,
     "lifecyclePattern": "before-after"
   },
   "suggestedTestScenarios": [
-    "ValidateEmployee_有效員工資料_應回傳驗證通過",
-    "ValidateEmployee_名字為空_應回傳驗證失敗",
-    "ValidateEmployee_薪資為負數_應回傳驗證失敗",
-    "CalculateAnnualBonus_績效1到5_應回傳正確獎金比例",
-    "CalculateAnnualBonus_不同薪資與績效組合_應正確計算"
+    "ValidateTarget_資料有效_應回傳驗證通過",
+    "ValidateTarget_必要欄位為空_應回傳驗證失敗",
+    "ValidateTarget_數值超出允許範圍_應回傳驗證失敗",
+    "CalculateAnnualMetric_等級1到5_應回傳正確計算結果",
+    "CalculateAnnualMetric_不同基礎值與等級組合_應正確計算"
   ],
   "projectContext": {
     "targetFramework": "net9.0",
     "testFramework": "tunit",
-    "solutionPath": "samples/practice_tunit/Practice.TUnit.slnx",
-    "testProjectPath": "samples/practice_tunit/tests/Practice.TUnit.Core.Tests/Practice.TUnit.Core.Tests.csproj",
-    "sourceProjectPath": "samples/practice_tunit/src/Practice.TUnit.Core/Practice.TUnit.Core.csproj"
+    "solutionPath": "workspace/MyCompany.TUnit.slnx",
+    "testProjectPath": "workspace/tests/MyCompany.TUnit.Tests/MyCompany.TUnit.Tests.csproj",
+    "sourceProjectPath": "workspace/src/MyCompany.Core/MyCompany.Core.csproj"
   }
 }
 ```
@@ -269,3 +269,14 @@ model: Claude Sonnet 4.6 (copilot)
 10. **migrationSource 判定範圍** — `migrationSource` 的值必須**僅依據測試專案本身的 `.csproj` PackageReference** 來判斷。若 `.csproj` 中包含 `xunit` 套件引用則為 `"xunit"`，包含 `NUnit` 則為 `"nunit"`，僅包含 `TUnit` 或無任何測試框架引用則為 `null`。**不得**因為工作區其他目錄（例如 `migration_source/`）中存在 xUnit 或 NUnit 測試檔案而將 `migrationSource` 設為非 null 值
 11. **matrixCandidate 與 suggestedTestScenarios 互斥原則** — 當一個方法的 `matrixCandidate: true` 時，`suggestedTestScenarios` 中**只應包含一個 `[MethodDataSource]` 批次場景**（涵蓋所有組合），**不得同時列出個別組合案例**。例如，`CalculateAnnualFee` 若有 3 × 2 = 6 組合，只應列「CalculateAnnualFee_三種MembershipType與兩種isRenewal組合_應正確計算對應年費」，不應再逐一列出「CalculateAnnualFee_Basic且非續約_應回傳0」等 6 個個別案例。兩種方式並列會導致 Writer 重複實作，產生 12 個測試覆蓋相同 6 個邏輯案例。邊界/例外場景（如「CalculateAnnualFee_無效MembershipType_應拋出ArgumentOutOfRangeException」）不在此限，仍應個別列出
 12. **suggestedTestScenarios 命名禁止引用測試機制** — `suggestedTestScenarios` 的命名必須描述**預期行為**，**不得引用測試實作機制**（例如 `MethodDataSource`、`Arguments`、`ClassDataSource` 等）。錯誤範例：「BorrowBookAsync_三種MembershipType成功借閱_應以MethodDataSource驗證借閱期限」；正確範例：「BorrowBookAsync_依MembershipType借閱_借閱期限與MaxRenewals應符合會員等級規則」。第三段（預期結果）應描述業務邏輯的預期行為，而非測試框架的實作方式
+13. **不得以目標名稱分流** — 不可因類別名稱、專案名稱、歷史案例或 benchmark 目標而調整分析深度、輸出判準或建議策略；分析決策必須只依實際程式碼與結構化特徵
+
+---
+
+## JSON 交接輸出
+
+完成分析後，如果 Orchestrator 在 prompt 中指定了 JSON 輸出路徑（格式：`.orchestrator/{ClassName}/analyzer-result.json`），使用 `execute/runInTerminal` 將分析結果寫入該路徑：
+
+`$json = '{...}'; Set-Content -Path ".orchestrator/{ClassName}/analyzer-result.json" -Value $json -Encoding UTF8`
+
+其中 `{...}` 為上方 JSON 格式的完整分析報告內容。

@@ -3,7 +3,7 @@ name: dotnet-testing-advanced-integration-executor
 description: '建置與執行 .NET 整合測試，處理 Docker 環境檢查、編譯錯誤與測試失敗的修正迴圈'
 user-invocable: false
 tools: ['read', 'search', 'edit', 'execute/getTerminalOutput', 'execute/runInTerminal', 'read/terminalLastCommand', 'read/terminalSelection', 'execute/createAndRunTask']
-model: Claude Sonnet 4.6 (copilot)
+model: ['GPT-5.3-Codex (copilot)', 'GPT-5.4 (copilot)']
 ---
 
 # .NET 整合測試執行器
@@ -96,7 +96,7 @@ dotnet test <solution-path> --no-build --verbosity minimal --filter "FullyQualif
 
 ```
 📊 整合測試執行結果
-   方案：Practice.Integration.slnx
+   方案：<solution-path>
    Docker 狀態：✅ 可用（Docker Desktop 4.x.x）
    建置結果：✅ 成功
    測試結果：✅ 全部通過（12/12）
@@ -107,7 +107,7 @@ dotnet test <solution-path> --no-build --verbosity minimal --filter "FullyQualif
 
 ```
 📊 整合測試執行結果
-   方案：Practice.Integration.slnx
+   方案：<solution-path>
    Docker 狀態：✅ 可用
    建置結果：✅ 成功
    測試結果：❌ 部分失敗（10/12 通過，2 失敗）
@@ -157,7 +157,7 @@ dotnet test <solution-path> --no-build --verbosity minimal --filter "FullyQualif
 | `Could not open a connection to your authentication agent` | SSH agent 問題（git clone） | 非測試相關，忽略 |
 | `Database 'xxx' does not exist` | EF Core Migration 未執行 | 確認 `EnsureCreated()` 或 `Migrate()` 在 Factory InitializeAsync 中被呼叫 |
 | `The ConnectionString property has not been initialized` | 連線字串未設定 | 確認 WebApplicationFactory 有正確置換 ConnectionString |
-| `Services for database providers 'X', 'Y' have been registered` | 多個 DB Provider 衝突 | **優先修正策略（P1-2c 驗證教訓）**：(1) 先嘗試 `SingleOrDefault` 移除 `DbContextOptions<T>` descriptor；(2) 若仍失敗，修改 Program.cs 在 `AddDbContext<T>()` 外層加入 `if(!builder.Environment.IsEnvironment("Testing"))` 條件判斷，並在 WebApiFactory 中改用直接 `AddDbContext<T>()`（無需 descriptor 移除）+ `builder.UseEnvironment("Testing")`。**此為已授權的 Program.cs 修改** |
+| `Services for database providers 'X', 'Y' have been registered` | 多個 DB Provider 衝突 | **優先修正策略（通用）**：(1) 先嘗試 `SingleOrDefault` 移除 `DbContextOptions<T>` descriptor；(2) 若仍失敗，修改 Program.cs 在 `AddDbContext<T>()` 外層加入 `if(!builder.Environment.IsEnvironment("Testing"))` 條件判斷，並在 WebApiFactory 中改用直接 `AddDbContext<T>()`（無需 descriptor 移除）+ `builder.UseEnvironment("Testing")`。**此為已授權的 Program.cs 修改** |
 
 ---
 
@@ -181,3 +181,4 @@ dotnet test <solution-path> --no-build --verbosity minimal --filter "FullyQualif
 6. **容器清理** — 不需要手動清理容器，Testcontainers + `IAsyncLifetime.DisposeAsync` 會自動處理
 7. **精確錯誤分類** — 區分「測試碼錯誤」vs「被測碼 Bug」，影響修正策略
 8. **超時保護** — 整合測試可能因容器啟動耗時較長，合理設定超時（建議 5 分鐘以上）
+9. **不得以目標名稱分流** — 不可因 Controller 名稱、專案名稱、歷史案例或 benchmark 目標而改變錯誤分類、修正策略或回報門檻；決策必須只依實際錯誤訊息與執行結果

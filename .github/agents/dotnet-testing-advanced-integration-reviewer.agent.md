@@ -3,7 +3,7 @@ name: dotnet-testing-advanced-integration-reviewer
 description: '審查 .NET 整合測試的品質，載入品質相關 Skills 驗證命名、斷言、覆蓋率、容器管理等最佳實踐'
 user-invocable: false
 tools: ['read', 'search', 'search/listDirectory', 'execute/getTerminalOutput','execute/runInTerminal','read/terminalLastCommand','read/terminalSelection']
-model: ['Claude Sonnet 4.6 (copilot)', 'GPT-5.1-Codex-Max (copilot)']
+model: ['GPT-5.3-Codex (copilot)', 'GPT-5.4 (copilot)']
 ---
 
 # .NET 整合測試審查器
@@ -13,6 +13,15 @@ model: ['Claude Sonnet 4.6 (copilot)', 'GPT-5.1-Codex-Max (copilot)']
 ---
 
 ## 審查流程
+
+### Step 0：讀取 JSON 交接資訊（如果可用）
+
+如果 Orchestrator 在 prompt 中提供了 JSON 交接檔案路徑，使用 `execute/runInTerminal` 讀取：
+
+- 讀取 Analyzer 分析報告：`Get-Content -Path ".orchestrator/{TargetName}/analyzer-result.json" -Raw`
+- 讀取 Executor 執行結果：`Get-Content -Path ".orchestrator/{TargetName}/executor-result.json" -Raw`
+
+以這些 JSON 檔案的內容補充 Orchestrator 傳來的 prompt 資訊，取得更完整的分析背景與執行結果。
 
 ### Step 1：載入 Skills
 
@@ -86,8 +95,8 @@ dotnet test <solution-path> --no-build --verbosity minimal
 | HTTP 狀態碼斷言 | 必須使用 AwesomeAssertions.Web 專用擴充方法：`.Be200Ok()`、`.Be201Created()`、`.Be204NoContent()`、`.Be400BadRequest()`、`.Be404NotFound()`、`.Be409Conflict()` 等。不得使用不存在的 `.HaveStatusCode(HttpStatusCode.X)` |
 | ProblemDetails 完整驗證 | 驗證 `Status`、`Title`，並視情況驗證 `Detail`、`Errors` |
 | ValidationProblemDetails | 驗證 `Errors` 字典中的欄位名與錯誤訊息 |
-| 複合欄位驗證錯誤（P1-3 強化） | 多欄位同時驗證失敗的測試必須驗證每個欄位的 **key 存在性 + 錯誤訊息內容**，不得僅檢查 key 存在 |
-| 邊界 Happy Path 回應體（P1-3 強化） | 邊界值 Happy Path 測試（如 201 Created）必須使用 `.And.Satisfy<T>()` 驗證回應體資料，不得僅驗證 status code |
+| 複合欄位驗證錯誤 | 多欄位同時驗證失敗的測試必須驗證每個欄位的 **key 存在性 + 錯誤訊息內容**，不得僅檢查 key 存在 |
+| 邊界 Happy Path 回應體 | 邊界值 Happy Path 測試（如 201 Created）必須使用 `.And.Satisfy<T>()` 驗證回應體資料，不得僅驗證 status code |
 | 集合斷言 | 使用 `.Should().HaveCount(n)` 或 `.Should().ContainSingle()` 等 |
 | Null 安全斷言 | 使用 `.Should().NotBeNull()` 後再存取屬性（使用 `!` 運算子） |
 
@@ -111,7 +120,7 @@ dotnet test <solution-path> --no-build --verbosity minimal
 | 硬式編碼 | 避免不必要的 magic number / magic string |
 | 重複程式碼 | 相同設定邏輯應抽取到 TestBase 或 helper method |
 | Dispose 模式 | 確認 `HttpClient`、Factory 的生命週期正確管理 |
-| Factory 封裝性（P1-3 強化） | **所有** Factory 類型（包含 InMemory 和容器化）均不得暴露 `public EnsureCreatedAsync()` / `EnsureDatabaseCreated()` 方法。InMemory Factory 的資料庫初始化應由 IntegrationTestBase 的 `CleanupDatabaseAsync()` 內部處理（`EnsureDeletedAsync()` + `EnsureCreatedAsync()`）；容器 Factory 的 `EnsureCreatedAsync()` 必須在 `InitializeAsync()` 內部呼叫 |
+| Factory 封裝性 | **所有** Factory 類型（包含 InMemory 和容器化）均不得暴露 `public EnsureCreatedAsync()` / `EnsureDatabaseCreated()` 方法。InMemory Factory 的資料庫初始化應由 IntegrationTestBase 的 `CleanupDatabaseAsync()` 內部處理（`EnsureDeletedAsync()` + `EnsureCreatedAsync()`）；容器 Factory 的 `EnsureCreatedAsync()` 必須在 `InitializeAsync()` 內部呼叫 |
 
 ### 4e. 容器管理審查（條件性）
 
@@ -138,7 +147,7 @@ dotnet test <solution-path> --no-build --verbosity minimal
 | 錯誤路徑覆蓋 | 每個可能回傳 4xx/5xx 的情境都有對應測試 |
 | Validation 覆蓋 | 每個 FluentValidation 規則至少有一個測試 |
 | 對稱驗證覆蓋 | 當多個端點共用相同 Validator 規則時，所有端點的驗證測試覆蓋率必須對等（例如 Create 有 7 條驗證測試，Update 也必須有 7 條） |
-| 條件驗證邊界對稱（P1-3 強化） | 含條件驗證規則（如 `When(x => !string.IsNullOrEmpty(x.Notes))`）時，`null` 與空字串 `""` 是兩個不同邊界情境，Create 與 Update 都必須涵蓋。若 Create 有「備註為空字串」測試但 Update 沒有，視為對稱性破缺 |
+| 條件驗證邊界對稱 | 含條件驗證規則（如 `When(x => !string.IsNullOrEmpty(x.Notes))`）時，`null` 與空字串 `""` 是兩個不同邊界情境，Create 與 Update 都必須涵蓋。若 Create 有「備註為空字串」測試但 Update 沒有，視為對稱性破缺 |
 | 邊界情境 | 空集合、null 值、不存在的 ID 等邊界情境 |
 | 遺漏端點 | 比對 Controller 的所有 Action 與測試涵蓋情況 |
 
@@ -228,3 +237,4 @@ public async Task Delete_商品不存在_應回傳404ProblemDetails()
 6. **整合測試特有審查** — 包含容器管理、HTTP pipeline、ProblemDetails 等單元測試不會有的審查項目
 7. **覆蓋率以端點為單位** — 不是以被測類別方法為單位，而是以 HTTP 端點 × 情境為單位
 8. **公正客觀** — 報告必須反映真實狀況，不誇大也不輕描淡寫
+9. **不得以目標名稱分流** — 不可因 Controller 名稱、專案名稱、歷史案例或 benchmark 目標而調整審查尺度、評分門檻或問題嚴重度；判準必須只依 Skills 與實際測試內容
