@@ -8,10 +8,12 @@
   - 索引範圍（ingested=true 的項目全為 dotnet-test*，無雜訊）
   - 查詢功能（smoke test）
 
-注意：此腳本不修改索引。若需重建索引，請執行：
-    python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py --mode rebuild
-  若只更新有變動的文件（預設模式）：
-    python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py
+注意：此腳本不修改索引。若需重建索引，請依環境擇一執行：
+        python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills-online.py --skills-path <skills 來源路徑> --mode rebuild
+        python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills-offline.py --skills-path <skills 來源路徑> --mode rebuild
+    若只更新有變動的文件（預設模式），請依環境擇一執行：
+        python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills-online.py --skills-path <skills 來源路徑>
+        python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills-offline.py --skills-path <skills 來源路徑>
 
 用法：
     python docs/mcp_local_rag/scripts/mcp-local-rag-verify-skills-index.py
@@ -40,9 +42,8 @@ RESET = "\033[0m"
 
 def write_result(step: str, ok: bool, detail: str):
     status = " OK " if ok else "FAIL"
-    icon = "✓" if ok else "✗"
     color = GREEN if ok else RED
-    print(f"{color}[{status}] {step:<20} {icon}  {detail}{RESET}")
+    print(f"{color}[{status}] {step:<20} {detail}{RESET}")
 
 
 def main():
@@ -66,12 +67,12 @@ def main():
         else:
             write_result("DB 存在性", False, "目錄存在但 chunks.lance 缺失")
             print()
-            print(f"{RED}❌ DB 不完整，中止驗證。{RESET}")
+            print(f"{RED}DB 不完整，中止驗證。{RESET}")
             sys.exit(1)
     else:
-        write_result("DB 存在性", False, "目錄不存在，請先執行 docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py --skills-path <skills 來源路徑>")
+        write_result("DB 存在性", False, "目錄不存在，請先執行線上版或離線版索引腳本建立 DB")
         print()
-        print(f"{RED}❌ DB 不存在，中止驗證。{RESET}")
+        print(f"{RED}DB 不存在，中止驗證。{RESET}")
         sys.exit(1)
 
     rag_env = os.environ.copy()
@@ -179,10 +180,12 @@ def main():
     print()
     print("-" * 60)
     if failed == 0:
-        print(f"{GREEN}✅ 所有驗證通過（{passed} / {passed + failed}）{RESET}")
+        print(f"{GREEN}所有驗證通過（{passed} / {passed + failed}）{RESET}")
     else:
-        print(f"{RED}❌ 驗證未通過（通過 {passed}，失敗 {failed}）{RESET}")
-        print(f"{YELLOW}   → 若需重建索引請執行：python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py --skills-path <skills 來源路徑> --mode rebuild{RESET}")
+        print(f"{RED}驗證未通過（通過 {passed}，失敗 {failed}）{RESET}")
+        print(f"{YELLOW}   若需重建索引請擇一執行：{RESET}")
+        print(f"{YELLOW}      python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills-online.py --skills-path <skills 來源路徑> --mode rebuild{RESET}")
+        print(f"{YELLOW}      python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills-offline.py --skills-path <skills 來源路徑> --mode rebuild{RESET}")
     print()
 
 

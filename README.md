@@ -236,18 +236,20 @@ git clone https://github.com/kevintsengtw/dotnet-testing-agent-skills.git
 
 #### 步驟二：安裝 mcp-local-rag 並建立索引
 
+可連網環境可直接使用線上模式；若為受管制或無外網環境，請改依 `docs/mcp_local_rag/MCP_LOCAL_RAG_SETUP_GUIDE_OFFLINE.md` 使用離線模式。
+
 Windows（PowerShell）：
 
 ```powershell
 npm install -g mcp-local-rag
-.\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills.ps1 -SkillsPath C:\projects\dotnet-testing-agent-skills\.github\skills
+.\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills-online.ps1 -SkillsPath C:\projects\dotnet-testing-agent-skills\.github\skills
 ```
 
 macOS / Linux：
 
 ```bash
 npm install -g mcp-local-rag
-python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py --skills-path /path/to/dotnet-testing-agent-skills/.github/skills
+python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills-online.py --skills-path /path/to/dotnet-testing-agent-skills/.github/skills
 ```
 
 #### 步驟三：建立 `.vscode/mcp.json`

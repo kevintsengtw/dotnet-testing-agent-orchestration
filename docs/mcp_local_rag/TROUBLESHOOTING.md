@@ -51,17 +51,19 @@ ls /path/to/dotnet-testing-agent-skills/.github/skills
 git clone https://github.com/kevintsengtw/dotnet-testing-agent-skills.git
 ```
 
-PowerShell：
+PowerShell（線上模式）：
 
 ```powershell
-.\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills.ps1 -SkillsPath C:\projects\dotnet-testing-agent-skills\.github\skills
+.\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills-online.ps1 -SkillsPath C:\projects\dotnet-testing-agent-skills\.github\skills
 ```
 
-跨平台 Python 版本：
+跨平台 Python 版本（線上模式）：
 
 ```bash
-python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py --skills-path /path/to/dotnet-testing-agent-skills/.github/skills
+python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills-online.py --skills-path /path/to/dotnet-testing-agent-skills/.github/skills
 ```
+
+若為無外網或受管制環境，請改用離線模式腳本，或直接參考 `MCP_LOCAL_RAG_SETUP_GUIDE_OFFLINE.md`。
 
 ---
 
@@ -74,32 +76,32 @@ python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py --skills-path /p
 
 ### 排查與處理：重建或驗證索引
 
-PowerShell：
+PowerShell（線上模式）：
 
 ```powershell
-.\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills.ps1 -SkillsPath C:\projects\dotnet-testing-agent-skills\.github\skills
+.\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills-online.ps1 -SkillsPath C:\projects\dotnet-testing-agent-skills\.github\skills
 .\docs\mcp_local_rag\scripts\mcp-local-rag-verify-skills-index.ps1
 ```
 
-跨平台 Python 版本：
+跨平台 Python 版本（線上模式）：
 
 ```bash
-python ./docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py --skills-path /path/to/dotnet-testing-agent-skills/.github/skills
+python ./docs/mcp_local_rag/scripts/mcp-local-rag-index-skills-online.py --skills-path /path/to/dotnet-testing-agent-skills/.github/skills
 python ./docs/mcp_local_rag/scripts/mcp-local-rag-verify-skills-index.py
 ```
 
 若懷疑索引漂移，直接完整重建：
 
-PowerShell：
+PowerShell（線上模式）：
 
 ```powershell
-.\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills.ps1 -SkillsPath C:\projects\dotnet-testing-agent-skills\.github\skills -Mode rebuild
+.\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills-online.ps1 -SkillsPath C:\projects\dotnet-testing-agent-skills\.github\skills -Mode rebuild
 ```
 
-跨平台 Python 版本：
+跨平台 Python 版本（線上模式）：
 
 ```bash
-python ./docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py --skills-path /path/to/dotnet-testing-agent-skills/.github/skills --mode rebuild
+python ./docs/mcp_local_rag/scripts/mcp-local-rag-index-skills-online.py --skills-path /path/to/dotnet-testing-agent-skills/.github/skills --mode rebuild
 ```
 
 若環境只有 `python3`，請將上述命令中的 `python` 替換為 `python3`。
@@ -161,16 +163,16 @@ unzip -o docs/mcp_local_rag/model/Xenova-all-MiniLM-L6-v2.zip -d .mcp/cache
 
 #### 步驟 3：執行索引（不需網路）
 
-PowerShell：
+PowerShell（離線模式）：
 
 ```powershell
-.\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills.ps1 -SkillsPath C:\projects\dotnet-testing-agent-skills\.github\skills
+.\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills-offline.ps1 -SkillsPath C:\projects\dotnet-testing-agent-skills\.github\skills
 ```
 
-跨平台 Python 版本：
+跨平台 Python 版本（離線模式）：
 
 ```bash
-python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py --skills-path /path/to/dotnet-testing-agent-skills/.github/skills
+python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills-offline.py --skills-path /path/to/dotnet-testing-agent-skills/.github/skills
 ```
 
 ### 維護：更新模型 zip
@@ -291,12 +293,14 @@ mcp-local-rag --db-path .mcp/dotnet-testing-skills query "NSubstitute mock inter
 
 ### PowerShell
 
-- 初次建立或更新索引：`docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.ps1`（需加 `-SkillsPath`）
+- 線上模式索引：`docs/mcp_local_rag/scripts/mcp-local-rag-index-skills-online.ps1`（需加 `-SkillsPath`）
+- 離線模式索引：`docs/mcp_local_rag/scripts/mcp-local-rag-index-skills-offline.ps1`（需加 `-SkillsPath`）
 - 驗證現有索引狀態：`docs/mcp_local_rag/scripts/mcp-local-rag-verify-skills-index.ps1`
 
 ### Python
 
-- 初次建立或更新索引：`docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py`（需加 `--skills-path`）
+- 線上模式索引：`docs/mcp_local_rag/scripts/mcp-local-rag-index-skills-online.py`（需加 `--skills-path`）
+- 離線模式索引：`docs/mcp_local_rag/scripts/mcp-local-rag-index-skills-offline.py`（需加 `--skills-path`）
 - 驗證現有索引狀態：`docs/mcp_local_rag/scripts/mcp-local-rag-verify-skills-index.py`
 
 若你是在 macOS / Linux，優先使用 Python 版本；若環境只有 `python3`，請把命令中的 `python` 改成 `python3`。
