@@ -112,6 +112,134 @@ python ./docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py --skills-path 
 
 - 初次建立索引時卡在 model 下載。
 - 公司網路阻擋 HuggingFace。
+- 出現 `fetch failed`、`ECONNREFUSED`、`certificate` 或 timeout 等下載錯誤。
+
+### 說明：企業環境的限制
+
+`mcp-local-rag` 首次建立索引時會從 HuggingFace 下載 embedding model（`Xenova/all-MiniLM-L6-v2`，約 90MB）並快取至 `CACHE_DIR`（`.mcp/cache`）。企業網路通常封鎖對外連線，導致下載失敗。
+
+本 repo 已在 `docs/mcp_local_rag/model/` 預先打包 zip 檔案，可直接解壓縮後使用，無需存取 HuggingFace。
+
+### 處理：解壓縮預打包模型
+
+#### 步驟 1：確認 zip 檔案存在
+
+```text
+docs/mcp_local_rag/model/Xenova-all-MiniLM-L6-v2.zip
+```
+
+#### 步驟 2：建立 cache 目錄並解壓縮
+
+PowerShell：
+
+```powershell
+New-Item -ItemType Directory -Force -Path .mcp\cache | Out-Null
+Expand-Archive -Path docs\mcp_local_rag\model\Xenova-all-MiniLM-L6-v2.zip -DestinationPath .mcp\cache -Force
+```
+
+Linux / macOS：
+
+```bash
+mkdir -p .mcp/cache
+unzip -o docs/mcp_local_rag/model/Xenova-all-MiniLM-L6-v2.zip -d .mcp/cache
+```
+
+解壓縮後的目錄結構：
+
+```text
+.mcp/cache/
+└── Xenova/
+    └── all-MiniLM-L6-v2/
+        ├── config.json
+        ├── tokenizer.json
+        ├── tokenizer_config.json
+        ├── special_tokens_map.json
+        ├── vocab.txt
+        └── onnx/
+            └── model_quantized.onnx
+```
+
+#### 步驟 3：執行索引（不需網路）
+
+PowerShell：
+
+```powershell
+.\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills.ps1 -SkillsPath C:\projects\dotnet-testing-agent-skills\.github\skills
+```
+
+跨平台 Python 版本：
+
+```bash
+python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py --skills-path /path/to/dotnet-testing-agent-skills/.github/skills
+```
+
+### 維護：更新模型 zip
+
+當 `mcp-local-rag` 升級 embedding model 版本時，由維護者重新打包。  
+zip 只包含 model 本身，與 index 無關，不需要 clone `dotnet-testing-agent-skills`。
+
+#### 步驟 1：在有網路的機器上下載 model
+
+使用 `huggingface_hub` 直接下載 model 檔案，不建立 index：
+
+```bash
+pip install huggingface_hub
+```
+
+```bash
+python -c "
+from huggingface_hub import snapshot_download
+snapshot_download(
+    'Xenova/all-MiniLM-L6-v2',
+    local_dir='.mcp/cache/Xenova/all-MiniLM-L6-v2',
+    ignore_patterns=['*.msgpack','*.h5','flax_model*','tf_model*','pytorch_model*','rust_model*']
+)
+"
+```
+
+下載完成後確認：
+
+```bash
+ls .mcp/cache/Xenova/all-MiniLM-L6-v2/
+# 應看到 config.json、tokenizer.json、onnx/ 等檔案
+```
+
+#### 步驟 2：打包成 zip（僅包含必要檔案）
+
+zip 只打包 mcp-local-rag 實際需要的 6 個檔案，排除其他 ONNX 變體與 HuggingFace 管理檔。
+
+PowerShell：
+
+```powershell
+$src = ".mcp\cache\Xenova\all-MiniLM-L6-v2"
+$tmp = "$env:TEMP\model-pack\Xenova\all-MiniLM-L6-v2"
+New-Item -ItemType Directory -Force -Path "$tmp\onnx" | Out-Null
+Copy-Item "$src\config.json", "$src\tokenizer.json", "$src\tokenizer_config.json", "$src\special_tokens_map.json", "$src\vocab.txt" $tmp
+Copy-Item "$src\onnx\model_quantized.onnx" "$tmp\onnx\"
+Compress-Archive -Path "$env:TEMP\model-pack\Xenova" -DestinationPath docs\mcp_local_rag\model\Xenova-all-MiniLM-L6-v2.zip -Force
+Remove-Item -Recurse -Force "$env:TEMP\model-pack"
+```
+
+Linux / macOS：
+
+```bash
+src=".mcp/cache/Xenova/all-MiniLM-L6-v2"
+tmp="/tmp/model-pack/Xenova/all-MiniLM-L6-v2"
+mkdir -p "$tmp/onnx"
+cp "$src/config.json" "$src/tokenizer.json" "$src/tokenizer_config.json" "$src/special_tokens_map.json" "$src/vocab.txt" "$tmp/"
+cp "$src/onnx/model_quantized.onnx" "$tmp/onnx/"
+cd /tmp/model-pack
+zip -r - Xenova/ > /path/to/repo/docs/mcp_local_rag/model/Xenova-all-MiniLM-L6-v2.zip
+rm -rf /tmp/model-pack
+```
+
+#### 步驟 3：Commit 並 push
+
+```bash
+git add docs/mcp_local_rag/model/Xenova-all-MiniLM-L6-v2.zip
+git commit -m "更新: 更新預打包 embedding model zip"
+git push
+```
 
 ---
 
