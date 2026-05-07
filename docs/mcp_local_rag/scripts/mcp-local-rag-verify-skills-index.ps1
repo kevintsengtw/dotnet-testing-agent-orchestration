@@ -9,10 +9,12 @@
     - 索引範圍（ingested=true 的項目全為 dotnet-test*，無雜訊）
     - 查詢功能（smoke test）
 
-    注意：此腳本不修改索引。若需重建索引，請執行：
-        .\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills.ps1 -Mode rebuild
-    若只更新有變動的文件（預設模式）：
-        .\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills.ps1
+    注意：此腳本不修改索引。若需重建索引，請依環境擇一執行：
+        .\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills-online.ps1 -SkillsPath <skills 來源路徑> -Mode rebuild
+        .\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills-offline.ps1 -SkillsPath <skills 來源路徑> -Mode rebuild
+    若只更新有變動的文件（預設模式），請依環境擇一執行：
+        .\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills-online.ps1 -SkillsPath <skills 來源路徑>
+        .\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills-offline.ps1 -SkillsPath <skills 來源路徑>
 #>
 
 $repoRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
@@ -23,9 +25,8 @@ $fail = 0
 
 function Write-Result {
     param([string]$Step, [bool]$Ok, [string]$Detail)
-    $icon = if ($Ok) { "✓" } else { "✗" }
     $color = if ($Ok) { "Green" } else { "Red" }
-    Write-Host ("[{0}] {1,-20} {2}  {3}" -f $(if ($Ok) { " OK " } else { "FAIL" }), $Step, $icon, $Detail) -ForegroundColor $color
+    Write-Host ("[{0}] {1,-20} {2}" -f $(if ($Ok) { " OK " } else { "FAIL" }), $Step, $Detail) -ForegroundColor $color
 }
 
 Write-Host ""
@@ -39,14 +40,14 @@ if ($dbExists) {
     $detail = if ($chunksExist) { "chunks.lance 存在" } else { "目錄存在但 chunks.lance 缺失" }
     $ok = $chunksExist
 } else {
-    $detail = "目錄不存在，請先執行 .\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills.ps1 -SkillsPath <skills 來源路徑> -Mode rebuild"
+    $detail = "目錄不存在，請先執行線上版或離線版索引腳本重建 DB"
     $ok = $false
 }
 Write-Result "DB 存在性" $ok $detail
 if (-not $ok) {
     $fail++
     Write-Host ""
-    Write-Host "❌ DB 不存在，中止驗證。" -ForegroundColor Red
+    Write-Host "DB 不存在，中止驗證。" -ForegroundColor Red
     exit 1
 }
 $pass++
@@ -153,9 +154,11 @@ if (Test-Path $cacheDir) {
 Write-Host ""
 Write-Host ("-" * 60)
 if ($fail -eq 0) {
-    Write-Host "✅ 所有驗證通過（$pass / $($pass + $fail)）" -ForegroundColor Green
+    Write-Host "所有驗證通過（$pass / $($pass + $fail)）" -ForegroundColor Green
 } else {
-    Write-Host "❌ 驗證未通過（通過 $pass，失敗 $fail）" -ForegroundColor Red
-    Write-Host "   → 若需重建索引請執行：.\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills.ps1 -SkillsPath <skills 來源路徑> -Mode rebuild" -ForegroundColor Yellow
+    Write-Host "驗證未通過（通過 $pass，失敗 $fail）" -ForegroundColor Red
+    Write-Host "   若需重建索引請擇一執行：" -ForegroundColor Yellow
+    Write-Host "      .\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills-online.ps1 -SkillsPath <skills 來源路徑> -Mode rebuild" -ForegroundColor Yellow
+    Write-Host "      .\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills-offline.ps1 -SkillsPath <skills 來源路徑> -Mode rebuild" -ForegroundColor Yellow
 }
 Write-Host ""

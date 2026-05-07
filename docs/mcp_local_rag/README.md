@@ -10,17 +10,25 @@
 
 1. [MCP_LOCAL_RAG_SETUP_GUIDE.md](MCP_LOCAL_RAG_SETUP_GUIDE.md)
 
-   首次安裝或重建環境時先讀這份，內容涵蓋前置需求（含取得 dotnet-testing-agent-skills）、Node.js、CLI 安裝、索引建立、驗證與維護。
+   安裝總覽入口，提供線上安裝版與離線模型版的分流。
 
-2. [MCP_LOCAL_RAG_DESIGN.md](MCP_LOCAL_RAG_DESIGN.md)
+2. [MCP_LOCAL_RAG_SETUP_GUIDE_ONLINE.md](MCP_LOCAL_RAG_SETUP_GUIDE_ONLINE.md)
+
+   可連網環境使用，模型由 mcp-local-rag 首次執行時自動下載。
+
+3. [MCP_LOCAL_RAG_SETUP_GUIDE_OFFLINE.md](MCP_LOCAL_RAG_SETUP_GUIDE_OFFLINE.md)
+
+   受管制網路或無外網環境使用，模型由 repo 內 zip 離線解壓提供。
+
+4. [MCP_LOCAL_RAG_DESIGN.md](MCP_LOCAL_RAG_DESIGN.md)
 
    用來理解為什麼這套 GitHub Copilot workflow 需要 mcp-local-rag，以及它如何和 SKILL 載入、RAG 查詢、subagent handoff 一起運作。
 
-3. [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
+5. [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
 
    處理 CLI、dotnet-testing* 技能找不到、索引、embedding model、query 品質與 `.vscode/mcp.json` 相關問題。
 
-4. [scripts/](scripts/)
+6. [scripts/](scripts/)
 
    存放索引與驗證腳本，供 Windows PowerShell 或跨平台 Python 環境使用。
 
@@ -30,7 +38,9 @@
 
 | 文件或目錄                                                   | 用途                           |
 | ------------------------------------------------------------ | ------------------------------ |
-| [MCP_LOCAL_RAG_SETUP_GUIDE.md](MCP_LOCAL_RAG_SETUP_GUIDE.md) | 安裝與維護指南                 |
+| [MCP_LOCAL_RAG_SETUP_GUIDE.md](MCP_LOCAL_RAG_SETUP_GUIDE.md) | 安裝入口與分流導覽             |
+| [MCP_LOCAL_RAG_SETUP_GUIDE_ONLINE.md](MCP_LOCAL_RAG_SETUP_GUIDE_ONLINE.md) | 線上安裝流程                   |
+| [MCP_LOCAL_RAG_SETUP_GUIDE_OFFLINE.md](MCP_LOCAL_RAG_SETUP_GUIDE_OFFLINE.md) | 離線模型安裝流程               |
 | [MCP_LOCAL_RAG_DESIGN.md](MCP_LOCAL_RAG_DESIGN.md)           | 設計背景、平台差異與採用理由   |
 | [TROUBLESHOOTING.md](TROUBLESHOOTING.md)                     | mcp-local-rag 專屬常見問題排查 |
 | [scripts/](scripts/)                                         | 建立與驗證 skills 索引的腳本   |
@@ -59,21 +69,26 @@ git clone https://github.com/kevintsengtw/dotnet-testing-agent-skills.git
 npm install -g mcp-local-rag
 ```
 
-### 步驟三：建立索引
+### 步驟三：選擇安裝方式
+
+- 可連網：依 [MCP_LOCAL_RAG_SETUP_GUIDE_ONLINE.md](MCP_LOCAL_RAG_SETUP_GUIDE_ONLINE.md)
+- 無外網：依 [MCP_LOCAL_RAG_SETUP_GUIDE_OFFLINE.md](MCP_LOCAL_RAG_SETUP_GUIDE_OFFLINE.md)
+
+### 步驟四：建立索引
 
 Windows（PowerShell）：
 
 ```powershell
-.\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills.ps1 -SkillsPath C:\projects\dotnet-testing-agent-skills\.github\skills
+.\docs\mcp_local_rag\scripts\mcp-local-rag-index-skills-online.ps1 -SkillsPath C:\projects\dotnet-testing-agent-skills\.github\skills
 ```
 
 macOS / Linux：
 
 ```bash
-python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills.py --skills-path /path/to/dotnet-testing-agent-skills/.github/skills
+python docs/mcp_local_rag/scripts/mcp-local-rag-index-skills-online.py --skills-path /path/to/dotnet-testing-agent-skills/.github/skills
 ```
 
-### 步驟四：驗證索引
+### 步驟五：驗證索引
 
 Windows（PowerShell）：
 
